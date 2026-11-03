@@ -467,7 +467,7 @@
         <!-- 3. Chọn Xe & Điểm Giao Xe -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">Đời xe và biển số xe *</label>
+            <label class="block text-slate-300 font-semibold mb-1">Chọn xe (Tên xe và biển số xe) *</label>
             <select id="formMotorcycleId" required onchange="handleBikeChange()" class="input-dark w-full rounded-lg px-3 py-2"></select>
           </div>
           <div>
@@ -1961,7 +1961,7 @@
       const sel = document.getElementById('formMotorcycleId');
       if (!sel) return;
       sel.innerHTML = motorcycles.map(m => `
-        <option value="${m.id}">${m.model} - Biển số: ${m.licensePlate} (${formatVND(m.dailyRate)}/đêm)</option>
+        <option value="${m.id}">${m.model} - Biển số: ${m.licensePlate}</option>
       `).join('');
     }
 
