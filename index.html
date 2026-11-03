@@ -2255,40 +2255,6 @@
         }
       }
     }
-        renderAll();
-        showToast(`Đã tạo đơn đặt xe mới ${newId} thành công!`);
-      } else {
-        // Sửa đơn hàng đã có
-        const existing = bookings.find(b => b.id === id);
-        if (!existing) return;
-
-        if (currentUser.role === 'admin') {
-          Object.assign(existing, payload);
-          syncBikeStatuses();
-          saveToStorage();
-          closeBookingModal();
-          renderAll();
-          showToast(`Admin đã cập nhật trực tiếp đơn ${id}!`, 'success');
-        } else {
-          const reason = document.getElementById('formEditReason').value.trim();
-          const now = getNowTimestampVN();
-          const reqId = 'REQ-' + String(approvalRequests.length + 1).padStart(2, '0');
-          approvalRequests.unshift({
-            reqId,
-            bookingId: id,
-            requestedBy: currentUser.email,
-            requestedAt: now.isoDateTime,
-            reason: reason || 'Nhân viên cập nhật thông tin đơn hàng',
-            status: 'Pending',
-            proposedData: { ...existing, ...payload }
-          });
-          saveToStorage();
-          closeBookingModal();
-          renderAll();
-          showToast(`Đã gửi yêu cầu chỉnh sửa (${reqId}) chờ adm@didibaophe.vn phê duyệt!`, 'warn');
-        }
-      }
-    }
 
     // MODAL THÊM XE MỚI
     function openAddBikeModal() {
