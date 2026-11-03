@@ -139,7 +139,7 @@
           <i class="fa-solid fa-calendar-check"></i> Đơn Đặt Xe & Lịch Cọc
         </button>
         <button onclick="switchTab('fleet')" id="tabBtn-fleet" class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-300 hover:text-white">
-          <i class="fa-solid fa-motorcycle"></i> Kho Xe & Khách Sạn Gửi
+          <i class="fa-solid fa-motorcycle"></i> Kho Xe & Bãi Xe Đậu
         </button>
         <button onclick="switchTab('maintenance')" id="tabBtn-maintenance" class="tab-btn px-3.5 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 text-slate-300 hover:text-white">
           <i class="fa-solid fa-oil-can"></i> Thay Nhớt Định Kỳ
@@ -282,7 +282,7 @@
               <option value="ALL">Tất cả trạng thái</option>
               <option value="Reserved">Đã cọc giữ xe (Chờ lấy)</option>
               <option value="Ongoing">Đang đi (Đã giao xe)</option>
-              <option value="Completed">Đã trả xe về KS</option>
+              <option value="Completed">Đã trả xe về bãi</option>
             </select>
           </div>
 
@@ -290,7 +290,7 @@
             <button onclick="resetFilters()" class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700" title="Xóa bộ lọc">
               <i class="fa-solid fa-rotate-left"></i>
             </button>
-            <button onclick="openBookingModal()" class="gold-btn flex-1 py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5">
+            <button onclick="openBookingModal()" class="gold-btn flex-1 py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1.5 font-bold">
               <i class="fa-solid fa-plus"></i> Tạo Đơn Mới
             </button>
           </div>
@@ -304,12 +304,12 @@
             <thead>
               <tr class="bg-[#0f151c] border-b border-slate-800 text-[11px] font-bold uppercase text-amber-300/90 tracking-wider">
                 <th class="py-3 px-3">Mã Đơn & Ngày Tạo</th>
-                <th class="py-3 px-3">Khách Hàng (SĐT / Mail)</th>
-                <th class="py-3 px-3">Đời Xe - Biển Số & KS Gửi</th>
+                <th class="py-3 px-3">Khách Hàng (SĐT / Kênh)</th>
+                <th class="py-3 px-3">Đời Xe - Biển Số & Vị Trí Xe</th>
                 <th class="py-3 px-3 bg-emerald-950/30 border-l border-emerald-500/20">Ngày Đi (Giao Xe)</th>
                 <th class="py-3 px-3 bg-sky-950/30 border-r border-sky-500/20">Ngày Trả (Thu Hồi)</th>
-                <th class="py-3 px-3">Điểm Đón & NV Giao/Lấy</th>
-                <th class="py-3 px-3">Quy Trình Cọc / Thu Đủ / Phát Sinh</th>
+                <th class="py-3 px-3">Điểm Đón & Người Giao</th>
+                <th class="py-3 px-3">Tiền Thuê (1 Xe × Đêm) & Cọc</th>
                 <th class="py-3 px-3 text-center">Trạng Thái</th>
                 <th class="py-3 px-3 text-right">Thao Tác Nghiệp Vụ</th>
               </tr>
@@ -320,12 +320,12 @@
       </div>
     </section>
 
-    <!-- ==================== TAB 2: KHO XE & KHÁCH SẠN ĐANG GỬI ==================== -->
+    <!-- ==================== TAB 2: KHO XE & BÃI XE ĐẬU ==================== -->
     <section id="section-fleet" class="hidden space-y-4">
       <div class="flex flex-wrap items-center justify-between gap-3 card-slate rounded-xl p-4">
         <div>
-          <h2 class="text-sm font-bold text-white uppercase tracking-wide">Quản Lý Đội Xe, Biển Số & Khách Sạn Đang Gửi Xe</h2>
-          <p class="text-xs text-slate-400">Theo dõi từng đời xe, biển số, vị trí khách sạn đang lưu giữ xe và định mức thay nhớt định kỳ</p>
+          <h2 class="text-sm font-bold text-white uppercase tracking-wide">Quản Lý Đội Xe, Biển Số & Vị Trí Bãi Đỗ Xe</h2>
+          <p class="text-xs text-slate-400">Theo dõi từng đời xe, biển số, bãi xe trụ sở DBP hoặc khách sạn đối tác lưu giữ xe và định mức thay nhớt</p>
         </div>
         <button onclick="openAddBikeModal()" class="gold-btn px-4 py-2 rounded-lg text-xs flex items-center gap-2">
           <i class="fa-solid fa-plus"></i> Thêm Xe Mới Vào Đội Xe
@@ -415,7 +415,7 @@
       <form id="bookingForm" onsubmit="saveBookingForm(event)" class="p-6 space-y-4 text-xs">
         <input type="hidden" id="formBookingId" />
 
-        <!-- Thông tin khách hàng -->
+        <!-- 1. Thông tin khách hàng -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="block text-slate-300 font-semibold mb-1">Tên khách hàng *</label>
@@ -426,111 +426,159 @@
             <input type="text" id="formCustPhone" required placeholder="VD: 0905123456" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code" />
           </div>
           <div>
-            <label class="block text-slate-300 font-semibold mb-1">Email khách hàng</label>
+            <label class="block text-slate-300 font-semibold mb-1">Email (Không bắt buộc)</label>
             <input type="email" id="formCustEmail" placeholder="khachhang@gmail.com" class="input-dark w-full rounded-lg px-3 py-2" />
           </div>
         </div>
 
-        <!-- Chọn xe & Điểm đón -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1">Chọn Xe (Đời xe - Biển số - Khách sạn đang gửi) *</label>
-            <select id="formMotorcycleId" required onchange="recalcModalTotals()" class="input-dark w-full rounded-lg px-3 py-2"></select>
+        <!-- 2. Kênh Đặt Đơn / Nguồn Khách (Mặc định Khách Lẻ Trực Tiếp - Không cần khách sạn) -->
+        <div class="p-3 rounded-xl bg-[#0b0f13] border border-slate-800 space-y-2.5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-amber-300 font-semibold mb-1">
+                <i class="fa-solid fa-route mr-1"></i>Kênh đặt đơn / Nguồn khách
+              </label>
+              <select id="formBookingSource" onchange="toggleHotelPartnerField()" class="input-dark w-full rounded-lg px-3 py-2 font-semibold text-slate-200">
+                <option value="direct" selected>🧍 Khách Lẻ / Trực Tiếp (Hotline, Zalo, Vãng lai - Không qua khách sạn)</option>
+                <option value="hotel">🏨 Khách Sạn / Lễ Tân Đối Tác Gửi Khách</option>
+                <option value="online">🌐 Website / Fanpage DIDIBAOPHE.VN</option>
+                <option value="tour">🤝 Tour / Đối Tác Du Lịch</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Ghi chú nguồn khách</label>
+              <input type="text" id="formSourceNote" placeholder="VD: Khách gọi Zalo, khách thuê lần 2..." class="input-dark w-full rounded-lg px-3 py-2" />
+            </div>
           </div>
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1">Điểm đón / Điểm giao xe cho khách *</label>
-            <input type="text" id="formPickupLocation" required placeholder="VD: Sảnh KS Mường Thanh / Ga Nha Trang" class="input-dark w-full rounded-lg px-3 py-2" />
+
+          <!-- Chỉ hiển thị khi chọn Khách Sạn Gửi -->
+          <div id="hotelPartnerBox" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+            <div>
+              <label class="block text-amber-300 font-semibold mb-1">Tên khách sạn / Lễ tân gửi khách *</label>
+              <input type="text" id="formHotelPartner" placeholder="VD: KS Mường Thanh / KS Sheraton / Lễ tân Tuấn" class="input-dark w-full rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label class="block text-amber-300 font-semibold mb-1">Hoa hồng gửi lại KS / Lễ tân (VNĐ)</label>
+              <input type="number" id="formHotelCommission" placeholder="0" min="0" step="5000" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code" />
+            </div>
           </div>
         </div>
 
-        <!-- Ngày Đi và Ngày Trả Tách Biệt -->
+        <!-- 3. Chọn Xe & Điểm Giao Xe -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Chọn Xe (Đời xe - Biển số - Vị trí bãi xe hiện tại) *</label>
+            <select id="formMotorcycleId" required onchange="handleBikeChange()" class="input-dark w-full rounded-lg px-3 py-2"></select>
+          </div>
+          <div>
+            <label class="block text-slate-300 font-semibold mb-1">Điểm bàn giao xe cho khách *</label>
+            <input type="text" id="formPickupLocation" required placeholder="VD: Bãi xe DBP / Sân bay / Ga tàu / Tận nơi..." class="input-dark w-full rounded-lg px-3 py-2" />
+            <div class="flex flex-wrap gap-1 mt-1.5">
+              <span class="text-[10px] text-slate-400 self-center mr-1">Điền nhanh:</span>
+              <button type="button" onclick="setPickupLoc('Trụ sở & Bãi xe DBP (38 Nguyễn Thái Học)')" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700">🏢 Bãi xe DBP</button>
+              <button type="button" onclick="setPickupLoc('Sân bay Cam Ranh (Ga Quốc Nội)')" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 border border-slate-700">✈️ Sân bay Cam Ranh</button>
+              <button type="button" onclick="setPickupLoc('Ga xe lửa Nha Trang')" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700">🚆 Ga Nha Trang</button>
+              <button type="button" onclick="setPickupLoc('Giao tận nơi theo địa chỉ khách')" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700">🏠 Giao tận nơi</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Lịch Thuê: Ngày Đi & Ngày Trả -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 rounded-xl bg-[#0b0f13] border border-slate-800">
           <div>
             <div class="flex justify-between items-center mb-1">
-              <label class="text-emerald-400 font-bold uppercase"><i class="fa-solid fa-plane-departure mr-1"></i>Ngày Đi & Giờ Giao Xe *</label>
+              <label class="text-emerald-400 font-bold uppercase"><i class="fa-solid fa-calendar-check mr-1"></i>Ngày Đi & Giờ Nhận Xe *</label>
               <span id="previewStartVN" class="font-mono-code text-[11px] text-emerald-300 bg-emerald-950/60 px-2 py-0.5 rounded">--/--/----</span>
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <input type="date" id="formStartDate" required onchange="recalcModalTotals()" class="input-dark rounded-lg px-2.5 py-2" />
-              <input type="time" id="formStartTime" required value="08:00" onchange="recalcModalTotals()" class="input-dark rounded-lg px-2.5 py-2 font-mono-code" />
+              <input type="date" id="formStartDate" required onchange="recalcNightsAndTotal()" class="input-dark rounded-lg px-2.5 py-2" />
+              <input type="time" id="formStartTime" required value="08:00" onchange="updateSummaryPreview()" class="input-dark rounded-lg px-2.5 py-2 font-mono-code" />
             </div>
           </div>
 
           <div>
             <div class="flex justify-between items-center mb-1">
-              <label class="text-sky-400 font-bold uppercase"><i class="fa-solid fa-plane-arrival mr-1"></i>Ngày Trả & Giờ Thu Hồi *</label>
+              <label class="text-sky-400 font-bold uppercase"><i class="fa-solid fa-calendar-xmark mr-1"></i>Ngày Trả & Giờ Trả Xe *</label>
               <span id="previewEndVN" class="font-mono-code text-[11px] text-sky-300 bg-sky-950/60 px-2 py-0.5 rounded">--/--/----</span>
             </div>
             <div class="grid grid-cols-2 gap-2">
-              <input type="date" id="formEndDate" required onchange="recalcModalTotals()" class="input-dark rounded-lg px-2.5 py-2" />
-              <input type="time" id="formEndTime" required value="18:00" onchange="recalcModalTotals()" class="input-dark rounded-lg px-2.5 py-2 font-mono-code" />
+              <input type="date" id="formEndDate" required onchange="recalcNightsAndTotal()" class="input-dark rounded-lg px-2.5 py-2" />
+              <input type="time" id="formEndTime" required value="18:00" onchange="updateSummaryPreview()" class="input-dark rounded-lg px-2.5 py-2 font-mono-code" />
             </div>
           </div>
         </div>
 
-        <!-- Nhân viên giao xe & Nhân viên lấy xe về -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1">Ai là người giao xe cho khách? *</label>
-            <input type="text" id="formDeliveryStaff" required placeholder="VD: Thắng (nv1@didibaophe.vn)" class="input-dark w-full rounded-lg px-3 py-2" />
+        <!-- 5. TÍNH TIỀN: 1 XE × ĐÊM = TỔNG TIỀN (THEO YÊU CẦU MỚI) -->
+        <div class="p-3.5 rounded-xl bg-[#0b0f13] border border-amber-500/30 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-amber-300 font-bold uppercase text-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-calculator text-amber-400"></i> Tính Đơn Thuê: 1 Xe × Đêm = Tiền
+              </span>
+            </div>
+            <div id="formulaBadge" class="font-mono-code font-bold text-xs text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 rounded-lg">
+              1 xe × 2 đêm = 360.000 ₫
+            </div>
           </div>
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1">Ai là người lấy xe về?</label>
-            <input type="text" id="formReturnStaff" placeholder="VD: Linh (nv2@didibaophe.vn)" class="input-dark w-full rounded-lg px-3 py-2" />
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Đơn giá thuê / đêm (VNĐ) *</label>
+              <input type="number" id="formDailyRate" required min="10000" step="10000" oninput="recalcFormulaFromInputs()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-amber-300 font-bold" />
+            </div>
+            <div>
+              <label class="block text-slate-300 font-semibold mb-1">Số đêm thuê xe *</label>
+              <div class="flex items-center gap-1.5">
+                <input type="number" id="formRentalNights" required min="1" step="1" oninput="handleNightsManualInput()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-white font-bold text-center" />
+                <span class="text-slate-400 font-semibold text-xs whitespace-nowrap">đêm</span>
+              </div>
+            </div>
+            <div>
+              <label class="block text-emerald-400 font-bold mb-1">Tổng tiền thuê (1 xe × đêm)</label>
+              <input type="number" id="formBaseAmount" required readonly class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-emerald-300 font-black bg-slate-900/90 cursor-not-allowed text-base" />
+            </div>
+          </div>
+
+          <!-- Tiền khách cọc & Còn lại phải thu -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2.5 border-t border-slate-800/80 items-center">
+            <div>
+              <label class="block text-amber-300 font-semibold mb-1">
+                <i class="fa-solid fa-hand-holding-dollar mr-1"></i>Tiền khách cọc trước (VNĐ)
+              </label>
+              <input type="number" id="formDepositAmount" min="0" step="10000" value="150000" oninput="updateSummaryPreview()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-amber-300 font-bold" placeholder="0" />
+            </div>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
+              <div>
+                <div class="text-[11px] text-slate-400">Tổng tiền đơn: <strong id="modalTotalText" class="font-mono-code text-white font-bold">0 ₫</strong></div>
+                <div class="text-[11px] text-amber-400 mt-0.5">Khách đã cọc: <strong id="modalDepositText" class="font-mono-code text-amber-300">0 ₫</strong></div>
+              </div>
+              <div class="text-right">
+                <div class="text-[10px] uppercase font-bold text-sky-400">Còn lại phải thu</div>
+                <div id="modalRemainingText" class="font-mono-code text-lg font-black text-sky-300">0 ₫</div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Tiền cọc giữ xe, Thu đủ & Phát sinh ngày đi -->
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 p-3 rounded-xl bg-[#0b0f13] border border-amber-500/20">
-          <div>
-            <label class="block text-slate-400 mb-1">Tiền thuê gốc (VNĐ)</label>
-            <input type="number" id="formBaseAmount" required min="0" step="10000" oninput="updateSummaryPreview()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-white font-bold" />
-          </div>
-          <div>
-            <label class="block text-amber-300 font-semibold mb-1">Khách cọc giữ xe (VNĐ)</label>
-            <input type="number" id="formDepositAmount" required min="0" step="10000" oninput="updateSummaryPreview()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-amber-300 font-bold" />
-          </div>
-          <div>
-            <label class="block text-purple-300 font-semibold mb-1">Số ngày phát sinh thêm</label>
-            <input type="number" id="formExtDays" min="0" value="0" oninput="recalcExtensionCost()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-purple-300" />
-          </div>
-          <div>
-            <label class="block text-purple-300 font-semibold mb-1">Tiền phát sinh thêm (VNĐ)</label>
-            <input type="number" id="formExtCost" min="0" step="10000" value="0" oninput="updateSummaryPreview()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-purple-300 font-bold" />
-          </div>
+        <!-- 6. Người giao xe (ĐÃ BỎ "Ai là người đi lấy xe về") -->
+        <div>
+          <label class="block text-slate-300 font-semibold mb-1">
+            <i class="fa-solid fa-person-biking mr-1 text-emerald-400"></i>Người giao xe cho khách *
+          </label>
+          <input type="text" id="formDeliveryStaff" required placeholder="VD: Thắng (nv1@didibaophe.vn)" class="input-dark w-full rounded-lg px-3 py-2" />
         </div>
 
-        <!-- Trạng thái đơn & Trạng thái thu tiền -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
-          <div>
-            <label class="block text-slate-300 font-semibold mb-1">Trạng thái giữ/giao xe</label>
-            <select id="formBookingStatus" class="input-dark w-full rounded-lg px-3 py-2">
-              <option value="Reserved">Đã cọc giữ xe (Chờ khách lấy)</option>
-              <option value="Ongoing">Đang đi (Đã giao xe)</option>
-              <option value="Completed">Đã trả xe về khách sạn</option>
-            </select>
-          </div>
-          <div class="flex items-center gap-2 pt-5">
-            <input type="checkbox" id="formPaidInFull" onchange="updateSummaryPreview()" class="w-4 h-4 accent-amber-400 rounded cursor-pointer" />
-            <label for="formPaidInFull" class="text-emerald-400 font-bold cursor-pointer">Đã thu đủ 100% tổng tiền</label>
-          </div>
-          <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-right">
-            <div class="text-[11px] text-slate-400">Tổng cộng: <span id="modalTotalText" class="font-mono-code font-bold text-white">0 ₫</span></div>
-            <div class="text-[11px] text-sky-400">Còn phải thu: <span id="modalRemainingText" class="font-mono-code font-bold">0 ₫</span></div>
-          </div>
-        </div>
-
-        <!-- Lý do chỉnh sửa (Bắt buộc khi Nhân viên gửi yêu cầu sửa) -->
+        <!-- Lý do chỉnh sửa (Chỉ hiện khi Nhân viên sửa đơn) -->
         <div id="staffEditReasonBox" class="hidden p-3 rounded-xl bg-amber-500/10 border border-amber-500/40">
           <label class="block text-amber-300 font-bold mb-1">
             <i class="fa-solid fa-lock mr-1"></i>Lý do xin chỉnh sửa đơn (Gửi <span class="font-mono-code">adm@didibaophe.vn</span> phê duyệt) *
           </label>
-          <input type="text" id="formEditReason" placeholder="VD: Khách đổi điểm giao xe sang KS Sheraton và gia hạn thêm 2 ngày..." class="input-dark w-full rounded-lg px-3 py-2" />
+          <input type="text" id="formEditReason" placeholder="VD: Khách đổi ngày và cọc thêm tiền..." class="input-dark w-full rounded-lg px-3 py-2" />
         </div>
 
         <div class="flex justify-end gap-2 pt-3 border-t border-slate-800">
           <button type="button" onclick="closeBookingModal()" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Hủy</button>
-          <button type="submit" id="bookingSubmitBtn" class="gold-btn px-5 py-2 rounded-lg">Lưu Đơn Đặt Xe</button>
+          <button type="submit" id="bookingSubmitBtn" class="gold-btn px-6 py-2.5 rounded-lg font-bold">Lưu Đơn Đặt Xe</button>
         </div>
       </form>
     </div>
@@ -801,7 +849,7 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                   <tr>
-                    <td class="py-2 px-3 text-slate-700">1. Tiền thuê xe gốc</td>
+                    <td class="py-2 px-3 text-slate-700">1. Tiền thuê xe (<span id="printFormulaText">1 xe × 3 đêm</span>)</td>
                     <td id="printBaseAmount" class="py-2 px-3 text-right font-mono-code font-bold text-slate-900">540.000 ₫</td>
                   </tr>
                   <tr>
@@ -1069,6 +1117,9 @@
         customerName: 'Trần Quốc Bảo',
         phone: '0905888999',
         email: 'tranquocbao@gmail.com',
+        bookingSource: 'hotel',
+        hotelPartner: 'KS Mường Thanh Luxury',
+        hotelCommission: 30000,
         motorcycleId: 'XM-01',
         startDate: '2026-11-02',
         startTime: '08:00',
@@ -1077,6 +1128,8 @@
         pickupLocation: 'Sảnh KS Mường Thanh Luxury (60 Trần Phú)',
         deliveryStaff: 'Thắng (nv1@didibaophe.vn)',
         returnStaff: 'Linh (nv2@didibaophe.vn)',
+        dailyRate: 180000,
+        rentalNights: 3,
         baseAmount: 540000,
         depositAmount: 200000,
         extensionDays: 1,
@@ -1092,6 +1145,10 @@
         customerName: 'Lê Hoàng Phương Lan',
         phone: '0918234567',
         email: 'phuonglan.le@gmail.com',
+        bookingSource: 'direct',
+        hotelPartner: '',
+        hotelCommission: 0,
+        sourceNote: 'Khách gọi Hotline đặt trước',
         motorcycleId: 'XM-02',
         startDate: '2026-11-06',
         startTime: '09:30',
@@ -1099,7 +1156,9 @@
         endTime: '17:00',
         pickupLocation: 'Sân bay Quốc tế Cam Ranh (Cổng Ga Nội Địa)',
         deliveryStaff: 'Linh (nv2@didibaophe.vn)',
-        returnStaff: 'Thắng (nv1@didibaophe.vn)',
+        returnStaff: 'Chưa phân công',
+        dailyRate: 130000,
+        rentalNights: 3,
         baseAmount: 390000,
         depositAmount: 150000,
         extensionDays: 0,
@@ -1115,6 +1174,10 @@
         customerName: 'Nguyễn Hải Đăng',
         phone: '0987654321',
         email: 'haidang.nt@gmail.com',
+        bookingSource: 'direct',
+        hotelPartner: '',
+        hotelCommission: 0,
+        sourceNote: 'Khách đến bãi DBP thuê',
         motorcycleId: 'XM-03',
         startDate: '2026-10-30',
         startTime: '07:30',
@@ -1123,8 +1186,10 @@
         pickupLocation: 'Ga Nha Trang (17 Thái Nguyên)',
         deliveryStaff: 'Thắng (nv1@didibaophe.vn)',
         returnStaff: 'Thắng (nv1@didibaophe.vn)',
+        dailyRate: 200000,
+        rentalNights: 3,
         baseAmount: 600000,
-        depositAmount: 200000,
+        depositAmount: 600000,
         extensionDays: 0,
         extensionCost: 0,
         paidInFull: true,
@@ -1347,7 +1412,7 @@
 
       const filtered = bookings.filter(b => {
         const bike = motorcycles.find(m => m.id === b.motorcycleId) || {};
-        const searchTarget = `${b.id} ${b.customerName} ${b.phone} ${b.email} ${bike.model} ${bike.licensePlate} ${b.pickupLocation} ${b.deliveryStaff} ${b.returnStaff}`.toLowerCase();
+        const searchTarget = `${b.id} ${b.customerName} ${b.phone} ${b.email} ${bike.model} ${bike.licensePlate} ${b.pickupLocation} ${b.deliveryStaff} ${b.returnStaff} ${b.bookingSource || ''} ${b.hotelPartner || ''} ${b.sourceNote || ''}`.toLowerCase();
         if (kw && !searchTarget.includes(kw)) return false;
         if (statusFilter !== 'ALL' && b.bookingStatus !== statusFilter) return false;
         if (dateVal && dateType !== 'all') {
@@ -1367,6 +1432,7 @@
         const collected = b.paidInFull ? total : Number(b.depositAmount || 0);
         const remain = Math.max(0, total - collected);
         const hasPendingReq = approvalRequests.some(r => r.bookingId === b.id && r.status === 'Pending');
+        const nights = b.rentalNights || Math.max(1, Math.round((new Date(b.endDate) - new Date(b.startDate)) / (1000 * 60 * 60 * 24)));
 
         let statusBadge = '';
         if (b.bookingStatus === 'Reserved') {
@@ -1393,13 +1459,22 @@
             <td class="py-3.5 px-3">
               <div class="font-bold text-white text-sm">${b.customerName}</div>
               <div class="font-mono-code text-amber-300 text-xs mt-0.5"><i class="fa-solid fa-phone mr-1 text-[10px]"></i>${b.phone}</div>
-              <div class="text-[11px] text-slate-400 truncate max-w-[170px]"><i class="fa-regular fa-envelope mr-1 text-[10px]"></i>${b.email || 'Chưa cập nhật'}</div>
+              <div class="text-[11px] text-slate-400 truncate max-w-[170px]"><i class="fa-regular fa-envelope mr-1 text-[10px]"></i>${b.email || 'Chưa cập nhật email'}</div>
+              <div class="mt-1">
+                ${b.bookingSource === 'hotel'
+                  ? `<span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold" title="Khách sạn gửi: ${b.hotelPartner || 'Đối tác KS'}"><i class="fa-solid fa-hotel"></i> KS: ${b.hotelPartner || 'Đối tác KS'}</span>`
+                  : `<span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold"><i class="fa-solid fa-user-check"></i> Khách trực tiếp (Không qua KS)</span>`
+                }
+              </div>
             </td>
 
             <td class="py-3.5 px-3">
               <div class="font-semibold text-white">${bike.model}</div>
               <div class="inline-block font-mono-code text-xs font-extrabold px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 mt-1">${bike.licensePlate}</div>
-              <div class="text-[11px] text-slate-400 mt-1"><i class="fa-solid fa-hotel text-amber-400 mr-1"></i>KS gửi: <span class="text-slate-200">${bike.currentLocation}</span></div>
+              <div class="text-[11px] text-slate-400 mt-1">
+                <i class="fa-solid ${bike.currentLocation.toLowerCase().includes('khách sạn') || bike.currentLocation.toLowerCase().includes('resort') ? 'fa-hotel text-amber-400' : 'fa-warehouse text-sky-400'} mr-1"></i>
+                <span class="text-slate-400">Vị trí xe:</span> <span class="text-slate-200">${bike.currentLocation}</span>
+              </div>
             </td>
 
             <!-- Cột Ngày Đi riêng biệt -->
@@ -1414,19 +1489,23 @@
               <span class="text-[10px] uppercase font-bold text-sky-400 block">Ngày Trả / Thu Hồi</span>
               <div class="font-mono-code font-bold text-sm text-sky-300 mt-0.5">${formatDateVN(b.endDate)}</div>
               <div class="font-mono-code text-[11px] text-slate-400"><i class="fa-regular fa-clock mr-1"></i>${b.endTime}</div>
+              <div class="mt-1">
+                <span class="inline-block px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-bold"><i class="fa-solid fa-moon mr-1"></i>${nights} đêm</span>
+              </div>
               ${b.extensionDays > 0 ? `<span class="mt-1 inline-block px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 text-[10px] font-bold">+${b.extensionDays} ngày phát sinh</span>` : ''}
             </td>
 
             <td class="py-3.5 px-3">
               <div class="text-slate-200 font-medium"><i class="fa-solid fa-location-dot text-rose-400 mr-1"></i>${b.pickupLocation}</div>
               <div class="text-[11px] text-emerald-300 mt-1"><i class="fa-solid fa-person-biking mr-1"></i>Giao xe: <strong>${b.deliveryStaff}</strong></div>
-              <div class="text-[11px] text-sky-300 mt-0.5"><i class="fa-solid fa-truck-pickup mr-1"></i>Lấy về: <strong>${b.returnStaff || 'Chưa phân công'}</strong></div>
+              ${b.returnStaff && b.returnStaff !== 'Chưa phân công' ? `<div class="text-[11px] text-sky-300 mt-0.5"><i class="fa-solid fa-truck-pickup mr-1"></i>Lấy về: <strong>${b.returnStaff}</strong></div>` : ''}
             </td>
 
             <td class="py-3.5 px-3 font-mono-code">
-              <div class="text-xs text-slate-300">Cọc giữ xe: <strong class="text-amber-300">${formatVND(b.depositAmount)}</strong></div>
-              ${b.extensionDays > 0 ? `<div class="text-[11px] text-purple-300">Phát sinh (+${b.extensionDays}N): +${formatVND(b.extensionCost)}</div>` : ''}
-              <div class="text-xs font-bold text-white mt-0.5">Tổng đơn: ${formatVND(total)}</div>
+              <div class="text-[11px] text-slate-400">Tiền thuê (1 xe × đêm): <strong class="text-white">${formatVND(b.baseAmount)}</strong></div>
+              <div class="text-xs text-amber-300 mt-0.5">Tiền cọc: <strong>${formatVND(b.depositAmount)}</strong></div>
+              ${b.extensionDays > 0 ? `<div class="text-[11px] text-purple-300">Phát sinh: +${formatVND(b.extensionCost)}</div>` : ''}
+              <div class="text-xs font-bold text-white mt-1 border-t border-slate-800 pt-1">Tổng đơn: ${formatVND(total)}</div>
               ${remain === 0
                 ? `<span class="inline-block mt-1 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-sans font-bold">✓ Đã thu đủ 100%</span>`
                 : `<span class="inline-block mt-1 px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-sans font-bold">Còn thu: ${formatVND(remain)}</span>`
@@ -1450,8 +1529,8 @@
                   </button>
                 ` : ''}
                 ${b.bookingStatus === 'Ongoing' ? `
-                  <button onclick="quickReturnBike('${b.id}')" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-semibold" title="Nhận xe về khách sạn & cập nhật KM">
-                    <i class="fa-solid fa-hotel mr-1"></i>Thu xe về
+                  <button onclick="quickReturnBike('${b.id}')" class="px-2 py-1 rounded bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-semibold" title="Nhận xe về bãi & hoàn tất đơn">
+                    <i class="fa-solid fa-warehouse mr-1"></i>Thu xe về bãi
                   </button>
                 ` : ''}
               </div>
@@ -1552,19 +1631,19 @@
       const b = bookings.find(x => x.id === bookingId);
       if (!b) return;
       const bike = motorcycles.find(m => m.id === b.motorcycleId);
-      const hotel = prompt('Xe sau khi thu hồi được gửi ở Khách sạn / Bãi nào?', bike ? bike.currentLocation : 'Khách sạn Mường Thanh Luxury');
-      if (!hotel) return;
-      const staff = prompt('Ai là người đi lấy xe về?', b.returnStaff || `Linh (${currentUser.email})`);
+      const returnLoc = prompt('Xe sau khi thu hồi được bàn giao về Bãi xe DBP hay Khách sạn nào?', 'Bãi xe Trụ Sở DBP (38 Nguyễn Thái Học)');
+      if (!returnLoc) return;
+      const staff = prompt('Ai là người đi lấy xe về?', (b.returnStaff && b.returnStaff !== 'Chưa phân công') ? b.returnStaff : `Linh (${currentUser.email})`);
       if (!staff) return;
 
       if (currentUser.role === 'admin' && bike) {
-        bike.currentLocation = hotel;
+        bike.currentLocation = returnLoc;
         bike.currentKm += 120;
       }
       applyOrRequestChange(
         b,
         { bookingStatus: 'Completed', returnStaff: staff, paidInFull: true },
-        `Đã lấy xe về gửi tại "${hotel}" bởi ${staff} & thu đủ tiền.`
+        `Đã lấy xe về bàn giao tại "${returnLoc}" bởi ${staff} & hoàn tất đơn.`
       );
     }
 
@@ -1615,8 +1694,8 @@
 
               <div class="mt-3 p-2.5 rounded-lg bg-[#0b0f13] border border-slate-800 space-y-1.5 text-xs">
                 <div class="flex items-center justify-between">
-                  <span class="text-slate-400"><i class="fa-solid fa-hotel text-amber-400 mr-1.5"></i>Khách sạn đang gửi:</span>
-                  <button onclick="changeBikeHotel('${m.id}')" class="text-[11px] text-amber-300 hover:underline"><i class="fa-solid fa-pen mr-1"></i>Đổi KS</button>
+                  <span class="text-slate-400"><i class="fa-solid fa-location-dot text-amber-400 mr-1.5"></i>Vị trí bãi đỗ hiện tại:</span>
+                  <button onclick="changeBikeHotel('${m.id}')" class="text-[11px] text-amber-300 hover:underline"><i class="fa-solid fa-pen mr-1"></i>Đổi Vị Trí</button>
                 </div>
                 <div class="font-semibold text-white">${m.currentLocation}</div>
               </div>
@@ -1659,12 +1738,12 @@
     function changeBikeHotel(bikeId) {
       const bike = motorcycles.find(m => m.id === bikeId);
       if (!bike) return;
-      const newLoc = prompt(`Cập nhật khách sạn / bãi gửi hiện tại cho xe ${bike.licensePlate}:`, bike.currentLocation);
+      const newLoc = prompt(`Cập nhật bãi đỗ / điểm lưu giữ hiện tại cho xe ${bike.licensePlate}:`, bike.currentLocation);
       if (newLoc && newLoc.trim()) {
         bike.currentLocation = newLoc.trim();
         saveToStorage();
         renderAll();
-        showToast(`Đã chuyển vị trí gửi xe ${bike.licensePlate} sang: ${bike.currentLocation}`);
+        showToast(`Đã chuyển vị trí xe ${bike.licensePlate} sang: ${bike.currentLocation}`);
       }
     }
 
@@ -1799,8 +1878,12 @@
       document.getElementById('printCreatedDate').textContent = formatDateTimeVN(b.createdDate, b.createdTime);
       document.getElementById('printCreatedBy').textContent = b.createdBy || 'adm@didibaophe.vn';
 
+      const nights = b.rentalNights || Math.max(1, Math.round((new Date(b.endDate) - new Date(b.startDate)) / (1000 * 60 * 60 * 24)));
+      const elFormula = document.getElementById('printFormulaText');
+      if (elFormula) elFormula.textContent = `1 xe × ${nights} đêm`;
+
       document.getElementById('printStaffDelivery').textContent = b.deliveryStaff || 'Thắng (0905.888.999)';
-      document.getElementById('printStaffReturn').textContent = b.returnStaff || 'Linh (0918.234.567)';
+      document.getElementById('printStaffReturn').textContent = (b.returnStaff && b.returnStaff !== 'Chưa phân công') ? b.returnStaff : 'Theo điều phối DBP';
       document.getElementById('printPickupLocation').textContent = b.pickupLocation || 'Tại điểm hẹn';
 
       document.getElementById('printCustName').textContent = b.customerName;
@@ -1874,11 +1957,111 @@
     }
 
     // MODAL ĐƠN ĐẶT XE (TẠO MỚI & SỬA / YÊU CẦU SỬA)
+    // MODAL ĐƠN ĐẶT XE (TẠO MỚI & SỬA / YÊU CẦU SỬA)
     function populateBikeSelect() {
       const sel = document.getElementById('formMotorcycleId');
+      if (!sel) return;
       sel.innerHTML = motorcycles.map(m => `
-        <option value="${m.id}">${m.model} - Biển: ${m.licensePlate} (${formatVND(m.dailyRate)}/ngày) - Gửi tại: ${m.currentLocation}</option>
+        <option value="${m.id}">${m.model} - Biển: ${m.licensePlate} (${formatVND(m.dailyRate)}/đêm) - [Vị trí: ${m.currentLocation}]</option>
       `).join('');
+    }
+
+    function setPickupLoc(loc) {
+      const el = document.getElementById('formPickupLocation');
+      if (el) el.value = loc;
+    }
+
+    function toggleHotelPartnerField() {
+      const srcEl = document.getElementById('formBookingSource');
+      const box = document.getElementById('hotelPartnerBox');
+      if (!srcEl || !box) return;
+      if (srcEl.value === 'hotel') {
+        box.classList.remove('hidden');
+      } else {
+        box.classList.add('hidden');
+      }
+    }
+
+    function handleBikeChange() {
+      const bikeId = document.getElementById('formMotorcycleId').value;
+      const bike = motorcycles.find(m => m.id === bikeId);
+      const rate = bike ? bike.dailyRate : 150000;
+      document.getElementById('formDailyRate').value = rate;
+      recalcNightsAndTotal();
+    }
+
+    function recalcNightsAndTotal() {
+      const sDate = document.getElementById('formStartDate').value;
+      const eDate = document.getElementById('formEndDate').value;
+      let nights = 1;
+      if (sDate && eDate) {
+        const d1 = new Date(sDate);
+        const d2 = new Date(eDate);
+        const diffDays = Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+        nights = Math.max(1, diffDays);
+      }
+      document.getElementById('formRentalNights').value = nights;
+      const rate = Number(document.getElementById('formDailyRate').value || 150000);
+      document.getElementById('formBaseAmount').value = nights * rate;
+      updateSummaryPreview();
+    }
+
+    function handleNightsManualInput() {
+      let nights = parseInt(document.getElementById('formRentalNights').value, 10);
+      if (isNaN(nights) || nights < 1) nights = 1;
+      const sDate = document.getElementById('formStartDate').value;
+      if (sDate) {
+        const d = new Date(sDate);
+        d.setDate(d.getDate() + nights);
+        document.getElementById('formEndDate').value = d.toISOString().split('T')[0];
+      }
+      const rate = Number(document.getElementById('formDailyRate').value || 150000);
+      document.getElementById('formBaseAmount').value = nights * rate;
+      updateSummaryPreview();
+    }
+
+    function recalcFormulaFromInputs() {
+      let nights = parseInt(document.getElementById('formRentalNights').value, 10) || 1;
+      const rate = Number(document.getElementById('formDailyRate').value || 0);
+      document.getElementById('formBaseAmount').value = nights * rate;
+      updateSummaryPreview();
+    }
+
+    function updateSummaryPreview() {
+      const sDate = document.getElementById('formStartDate').value;
+      const sTime = document.getElementById('formStartTime').value;
+      const eDate = document.getElementById('formEndDate').value;
+      const eTime = document.getElementById('formEndTime').value;
+      const pStart = document.getElementById('previewStartVN');
+      const pEnd = document.getElementById('previewEndVN');
+      if (pStart) pStart.textContent = formatDateTimeVN(sDate, sTime);
+      if (pEnd) pEnd.textContent = formatDateTimeVN(eDate, eTime);
+
+      const nights = parseInt(document.getElementById('formRentalNights').value, 10) || 1;
+      const rate = Number(document.getElementById('formDailyRate').value || 0);
+      const base = Number(document.getElementById('formBaseAmount').value || (nights * rate));
+      const dep = Number(document.getElementById('formDepositAmount').value || 0);
+      const remain = Math.max(0, base - dep);
+
+      const fBadge = document.getElementById('formulaBadge');
+      if (fBadge) {
+        fBadge.textContent = `1 xe × ${nights} đêm = ${formatVND(base)}`;
+      }
+
+      const totalTxt = document.getElementById('modalTotalText');
+      const depTxt = document.getElementById('modalDepositText');
+      const remainTxt = document.getElementById('modalRemainingText');
+
+      if (totalTxt) totalTxt.textContent = formatVND(base);
+      if (depTxt) depTxt.textContent = formatVND(dep);
+      if (remainTxt) {
+        if (remain === 0 && base > 0) {
+          remainTxt.innerHTML = `<span class="text-emerald-400 font-bold">0 ₫ (Đã thu đủ 100%)</span>`;
+        } else {
+          remainTxt.textContent = formatVND(remain);
+          remainTxt.className = 'font-mono-code text-lg font-black text-sky-300';
+        }
+      }
     }
 
     function openBookingModal(bookingId = null) {
@@ -1888,30 +2071,38 @@
       const submitBtn = document.getElementById('bookingSubmitBtn');
 
       if (!bookingId) {
-        // Tạo mới: Cả Admin và Nhân viên đều được nhập trực tiếp
+        // Tạo mới: Mặc định Khách Lẻ Trực Tiếp (Không cần khách sạn gửi)
         const now = getNowTimestampVN();
-        document.getElementById('bookingModalTitle').textContent = 'Tạo Đơn Đặt Xe & Lịch Cọc Mới';
+        document.getElementById('bookingModalTitle').textContent = 'Tạo Đơn Đặt Xe Mới';
         document.getElementById('bookingModalSub').textContent = `Người tạo đơn: ${currentUser.email} | Ngày tạo: ${now.vnDisplay}`;
         document.getElementById('formBookingId').value = '';
         document.getElementById('formCustName').value = '';
         document.getElementById('formCustPhone').value = '';
         document.getElementById('formCustEmail').value = '';
-        document.getElementById('formPickupLocation').value = '';
-        document.getElementById('formStartDate').value = '2026-11-04';
+        document.getElementById('formBookingSource').value = 'direct';
+        document.getElementById('formSourceNote').value = '';
+        document.getElementById('formHotelPartner').value = '';
+        document.getElementById('formHotelCommission').value = 0;
+        toggleHotelPartnerField();
+
+        document.getElementById('formPickupLocation').value = 'Trụ sở & Bãi xe DBP (38 Nguyễn Thái Học)';
+        document.getElementById('formStartDate').value = now.isoDate;
         document.getElementById('formStartTime').value = '08:00';
-        document.getElementById('formEndDate').value = '2026-11-06';
+
+        // Mặc định trả sau 2 đêm
+        const nextDate = new Date();
+        nextDate.setDate(nextDate.getDate() + 2);
+        document.getElementById('formEndDate').value = nextDate.toISOString().split('T')[0];
         document.getElementById('formEndTime').value = '18:00';
+
         document.getElementById('formDeliveryStaff').value = `Thắng (${currentUser.email})`;
-        document.getElementById('formReturnStaff').value = 'Linh (nv2@didibaophe.vn)';
         document.getElementById('formDepositAmount').value = 150000;
-        document.getElementById('formExtDays').value = 0;
-        document.getElementById('formExtCost').value = 0;
-        document.getElementById('formBookingStatus').value = 'Reserved';
-        document.getElementById('formPaidInFull').checked = false;
+
         reasonBox.classList.add('hidden');
         reasonInput.required = false;
         submitBtn.textContent = 'Tạo Đơn Đặt Xe Mới';
-        recalcModalTotals();
+
+        handleBikeChange();
       } else {
         // Chỉnh sửa đơn đã có
         const b = bookings.find(x => x.id === bookingId);
@@ -1919,7 +2110,13 @@
         document.getElementById('formBookingId').value = b.id;
         document.getElementById('formCustName').value = b.customerName;
         document.getElementById('formCustPhone').value = b.phone;
-        document.getElementById('formCustEmail').value = b.email;
+        document.getElementById('formCustEmail').value = b.email || '';
+        document.getElementById('formBookingSource').value = b.bookingSource || 'direct';
+        document.getElementById('formSourceNote').value = b.sourceNote || '';
+        document.getElementById('formHotelPartner').value = b.hotelPartner || '';
+        document.getElementById('formHotelCommission').value = b.hotelCommission || 0;
+        toggleHotelPartnerField();
+
         document.getElementById('formMotorcycleId').value = b.motorcycleId;
         document.getElementById('formPickupLocation').value = b.pickupLocation;
         document.getElementById('formStartDate').value = b.startDate;
@@ -1927,16 +2124,18 @@
         document.getElementById('formEndDate').value = b.endDate;
         document.getElementById('formEndTime').value = b.endTime;
         document.getElementById('formDeliveryStaff').value = b.deliveryStaff;
-        document.getElementById('formReturnStaff').value = b.returnStaff;
+        document.getElementById('formDepositAmount').value = b.depositAmount || 0;
+
+        const bike = motorcycles.find(m => m.id === b.motorcycleId);
+        const d1 = new Date(b.startDate);
+        const d2 = new Date(b.endDate);
+        const nights = b.rentalNights || Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+        document.getElementById('formRentalNights').value = nights;
+        document.getElementById('formDailyRate').value = (b.baseAmount && nights > 0) ? Math.round(b.baseAmount / nights) : (bike ? bike.dailyRate : 150000);
         document.getElementById('formBaseAmount').value = b.baseAmount;
-        document.getElementById('formDepositAmount').value = b.depositAmount;
-        document.getElementById('formExtDays').value = b.extensionDays;
-        document.getElementById('formExtCost').value = b.extensionCost;
-        document.getElementById('formBookingStatus').value = b.bookingStatus;
-        document.getElementById('formPaidInFull').checked = b.paidInFull;
 
         if (currentUser.role === 'admin') {
-          document.getElementById('bookingModalTitle').textContent = `Chỉnh Sửa Trực Tiếp Đơn ${b.id} (Quyền Admin)`;
+          document.getElementById('bookingModalTitle').textContent = `Chỉnh Sửa Trực Tiếp Đơn ${b.id} (Admin)`;
           document.getElementById('bookingModalSub').textContent = 'adm@didibaophe.vn có quyền lưu thay đổi trực tiếp ngay lập tức.';
           reasonBox.classList.add('hidden');
           reasonInput.required = false;
@@ -1959,57 +2158,38 @@
       document.getElementById('bookingModal').classList.add('hidden');
     }
 
-    function recalcModalTotals() {
-      const bikeId = document.getElementById('formMotorcycleId').value;
-      const bike = motorcycles.find(m => m.id === bikeId);
-      const rate = bike ? bike.dailyRate : 150000;
-      const sDate = document.getElementById('formStartDate').value;
-      const eDate = document.getElementById('formEndDate').value;
-
-      if (sDate && eDate) {
-        const d1 = new Date(sDate);
-        const d2 = new Date(eDate);
-        const diff = Math.max(1, Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)));
-        document.getElementById('formBaseAmount').value = diff * rate;
-      }
-      recalcExtensionCost();
-    }
-
-    function recalcExtensionCost() {
-      const bikeId = document.getElementById('formMotorcycleId').value;
-      const bike = motorcycles.find(m => m.id === bikeId);
-      const rate = bike ? bike.dailyRate : 150000;
-      const extDays = Number(document.getElementById('formExtDays').value || 0);
-      document.getElementById('formExtCost').value = extDays * rate;
-      updateSummaryPreview();
-    }
-
-    function updateSummaryPreview() {
-      const sDate = document.getElementById('formStartDate').value;
-      const sTime = document.getElementById('formStartTime').value;
-      const eDate = document.getElementById('formEndDate').value;
-      const eTime = document.getElementById('formEndTime').value;
-      document.getElementById('previewStartVN').textContent = formatDateTimeVN(sDate, sTime);
-      document.getElementById('previewEndVN').textContent = formatDateTimeVN(eDate, eTime);
-
-      const base = Number(document.getElementById('formBaseAmount').value || 0);
-      const ext = Number(document.getElementById('formExtCost').value || 0);
-      const dep = Number(document.getElementById('formDepositAmount').value || 0);
-      const paidFull = document.getElementById('formPaidInFull').checked;
-      const total = base + ext;
-      const remain = paidFull ? 0 : Math.max(0, total - dep);
-
-      document.getElementById('modalTotalText').textContent = formatVND(total);
-      document.getElementById('modalRemainingText').textContent = formatVND(remain);
-    }
-
     function saveBookingForm(e) {
       e.preventDefault();
       const id = document.getElementById('formBookingId').value;
+      const baseAmount = Number(document.getElementById('formBaseAmount').value || 0);
+      const depositAmount = Number(document.getElementById('formDepositAmount').value || 0);
+      const nights = Number(document.getElementById('formRentalNights').value || 1);
+      const dailyRate = Number(document.getElementById('formDailyRate').value || 150000);
+      const paidInFull = (depositAmount >= baseAmount);
+
+      const existing = bookings.find(x => x.id === id);
+      // Tự động xác định trạng thái đơn (Người dùng không cần chọn dropdown nữa)
+      let bookingStatus = 'Reserved';
+      if (existing) {
+        bookingStatus = existing.bookingStatus;
+      } else {
+        const sDate = document.getElementById('formStartDate').value;
+        const today = getNowTimestampVN().isoDate;
+        if (sDate === today && depositAmount >= baseAmount) {
+          bookingStatus = 'Ongoing';
+        } else {
+          bookingStatus = 'Reserved';
+        }
+      }
+
       const payload = {
         customerName: document.getElementById('formCustName').value.trim(),
         phone: document.getElementById('formCustPhone').value.trim(),
         email: document.getElementById('formCustEmail').value.trim(),
+        bookingSource: document.getElementById('formBookingSource').value,
+        sourceNote: document.getElementById('formSourceNote').value.trim(),
+        hotelPartner: document.getElementById('formBookingSource').value === 'hotel' ? document.getElementById('formHotelPartner').value.trim() : '',
+        hotelCommission: document.getElementById('formBookingSource').value === 'hotel' ? Number(document.getElementById('formHotelCommission').value || 0) : 0,
         motorcycleId: document.getElementById('formMotorcycleId').value,
         pickupLocation: document.getElementById('formPickupLocation').value.trim(),
         startDate: document.getElementById('formStartDate').value,
@@ -2017,13 +2197,15 @@
         endDate: document.getElementById('formEndDate').value,
         endTime: document.getElementById('formEndTime').value,
         deliveryStaff: document.getElementById('formDeliveryStaff').value.trim(),
-        returnStaff: document.getElementById('formReturnStaff').value.trim(),
-        baseAmount: Number(document.getElementById('formBaseAmount').value || 0),
-        depositAmount: Number(document.getElementById('formDepositAmount').value || 0),
-        extensionDays: Number(document.getElementById('formExtDays').value || 0),
-        extensionCost: Number(document.getElementById('formExtCost').value || 0),
-        bookingStatus: document.getElementById('formBookingStatus').value,
-        paidInFull: document.getElementById('formPaidInFull').checked
+        returnStaff: existing ? (existing.returnStaff || 'Chưa phân công') : 'Chưa phân công',
+        dailyRate: dailyRate,
+        rentalNights: nights,
+        baseAmount: baseAmount,
+        depositAmount: depositAmount,
+        extensionDays: existing ? (existing.extensionDays || 0) : 0,
+        extensionCost: existing ? (existing.extensionCost || 0) : 0,
+        bookingStatus: bookingStatus,
+        paidInFull: paidInFull
       };
 
       if (!id) {
@@ -2040,6 +2222,39 @@
         syncBikeStatuses();
         saveToStorage();
         closeBookingModal();
+        renderAll();
+        showToast(`Đã tạo đơn mới ${newId} thành công (1 xe × ${nights} đêm = ${formatVND(baseAmount)})!`);
+      } else {
+        // Sửa đơn hàng đã có
+        if (!existing) return;
+
+        if (currentUser.role === 'admin') {
+          Object.assign(existing, payload);
+          syncBikeStatuses();
+          saveToStorage();
+          closeBookingModal();
+          renderAll();
+          showToast(`Admin đã cập nhật trực tiếp đơn ${id}!`, 'success');
+        } else {
+          const reason = document.getElementById('formEditReason').value.trim();
+          const now = getNowTimestampVN();
+          const reqId = 'REQ-' + String(approvalRequests.length + 1).padStart(2, '0');
+          approvalRequests.unshift({
+            reqId,
+            bookingId: id,
+            requestedBy: currentUser.email,
+            requestedAt: now.isoDateTime,
+            reason: reason || 'Nhân viên cập nhật thông tin đơn hàng',
+            status: 'Pending',
+            proposedData: { ...existing, ...payload }
+          });
+          saveToStorage();
+          closeBookingModal();
+          renderAll();
+          showToast(`Đã gửi yêu cầu chỉnh sửa (${reqId}) chờ adm@didibaophe.vn phê duyệt!`, 'warn');
+        }
+      }
+    }
         renderAll();
         showToast(`Đã tạo đơn đặt xe mới ${newId} thành công!`);
       } else {
