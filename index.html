@@ -279,7 +279,7 @@
           <i class="fa-solid fa-chart-line text-purple-400 text-base"></i>
         </div>
         <div id="kpiNetProfit" class="text-xl font-extrabold text-purple-300 font-mono-code mt-1.5">0 ₫</div>
-        <div class="text-[11px] text-slate-400 mt-1">= Doanh thu - Chi phí bảo dưỡng</div>
+        <div id="kpiNetProfitSub" class="text-[11px] text-slate-400 mt-1">= Doanh thu - Bảo trì - Hoa hồng</div>
       </div>
     </section>
 
@@ -288,11 +288,11 @@
       <!-- Filter & Search Bar -->
       <div class="card-slate rounded-xl p-4">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div class="md:col-span-4">
+          <div class="md:col-span-3">
             <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">
               <i class="fa-solid fa-magnifying-glass text-amber-400 mr-1"></i>Tìm kiếm đơn hàng
             </label>
-            <input type="text" id="searchBookingInput" oninput="renderBookings()" placeholder="Mã đơn, Tên khách, SĐT, Email, Biển số xe, Điểm đón..." class="input-dark w-full rounded-lg px-3 py-2 text-xs" />
+            <input type="text" id="searchBookingInput" oninput="renderBookings()" placeholder="Mã đơn, Tên khách, SĐT, Đối tác, Biển số..." class="input-dark w-full rounded-lg px-3 py-2 text-xs" />
           </div>
 
           <div class="md:col-span-2">
@@ -320,16 +320,27 @@
             </select>
           </div>
 
-          <div class="md:col-span-2 flex gap-1.5">
-            <button onclick="resetFilters()" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700" title="Xóa bộ lọc">
-              <i class="fa-solid fa-rotate-left"></i>
-            </button>
-            <button onclick="switchTab('advance')" class="px-2.5 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold whitespace-nowrap flex items-center gap-1" title="Xem danh sách khách đặt cọc trước tầm 1 tháng để chuẩn bị xe">
-              <i class="fa-solid fa-calendar-days text-amber-400"></i> Đặt trước (<span id="btnAdvanceCount">0</span>)
-            </button>
-            <button onclick="openBookingModal()" class="gold-btn flex-1 py-2 px-2.5 rounded-lg text-xs flex items-center justify-center gap-1 font-bold whitespace-nowrap">
-              <i class="fa-solid fa-plus"></i> Tạo Đơn
-            </button>
+          <div class="md:col-span-3 flex gap-1.5">
+            <div class="flex-1">
+              <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Dòng tiền / Nơi thu</label>
+              <select id="filterPaymentMethod" onchange="renderBookings()" class="input-dark w-full rounded-lg px-2 py-2 text-xs font-semibold">
+                <option value="ALL">Tất cả dòng tiền</option>
+                <option value="company">🏢 Vào TK Công ty (QR)</option>
+                <option value="staff">🛵 NV nhận tiền mặt</option>
+                <option value="partner">🤝 Đơn có Đối tác / Hoa hồng</option>
+              </select>
+            </div>
+            <div class="self-end flex gap-1">
+              <button onclick="resetFilters()" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 border border-slate-700" title="Xóa bộ lọc">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+              <button onclick="switchTab('advance')" class="px-2.5 py-2 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-bold whitespace-nowrap flex items-center gap-1" title="Xem danh sách khách đặt cọc trước tầm 1 tháng để chuẩn bị xe">
+                <i class="fa-solid fa-calendar-days text-amber-400"></i> (<span id="btnAdvanceCount">0</span>)
+              </button>
+              <button onclick="openBookingModal()" class="gold-btn py-2 px-3 rounded-lg text-xs flex items-center justify-center gap-1 font-bold whitespace-nowrap">
+                <i class="fa-solid fa-plus"></i> Tạo Đơn
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -591,9 +602,9 @@
               </label>
               <select id="formBookingSource" onchange="toggleHotelPartnerField()" class="input-dark w-full rounded-lg px-3 py-2 font-semibold text-slate-200">
                 <option value="direct" selected>🧍 Khách Lẻ / Trực Tiếp (Hotline, Zalo, Vãng lai - Không qua KS)</option>
-                <option value="hotel">🏨 Khách Sạn / Đối Tác Gửi Khách</option>
+                <option value="hotel">🏨 Khách Sạn / Lễ Tân Gửi Khách (Có hoa hồng)</option>
+                <option value="tour">🤝 Tour / Đối Tác / Bác Tài Taxi (Có hoa hồng)</option>
                 <option value="online">🌐 Website / Fanpage DIDIBAOPHE.VN</option>
-                <option value="tour">🤝 Tour / Đối Tác Du Lịch</option>
               </select>
             </div>
             <div>
@@ -604,15 +615,56 @@
             </div>
           </div>
 
-          <!-- Chỉ hiển thị khi chọn Khách Sạn Gửi -->
-          <div id="hotelPartnerBox" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
-            <div>
-              <label class="block text-amber-300 font-semibold mb-1">Tên khách sạn / Lễ tân gửi khách *</label>
-              <input type="text" id="formHotelPartner" placeholder="VD: KS Mường Thanh / KS Sheraton / Lễ tân Tuấn" class="input-dark w-full rounded-lg px-3 py-2" />
+          <!-- KHUNG QUẢN LÝ ĐỐI TÁC & % TRÍCH HOA HỒNG (HIỂN THỊ KHI CÓ ĐỐI TÁC GỬI) -->
+          <div id="hotelPartnerBox" class="hidden p-3.5 rounded-xl bg-amber-950/25 border border-amber-500/40 space-y-3">
+            <div class="flex items-center justify-between border-b border-amber-500/20 pb-2">
+              <span class="text-xs font-bold text-amber-300 uppercase flex items-center gap-1.5">
+                <i class="fa-solid fa-handshake text-amber-400"></i> Đối Tác & % Trích Hoa Hồng
+              </span>
+              <span class="text-[11px] text-slate-400">Tự động tính tiền hoa hồng theo % tiền thuê</span>
             </div>
-            <div>
-              <label class="block text-amber-300 font-semibold mb-1">Hoa hồng gửi lại KS / Lễ tân (VNĐ)</label>
-              <input type="number" id="formHotelCommission" placeholder="0" min="0" step="5000" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code" />
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <!-- Tên Đối Tác -->
+              <div class="sm:col-span-6">
+                <label class="block text-slate-300 font-semibold mb-1">
+                  Tên đối tác / Khách sạn / Lễ tân / Bác tài *
+                </label>
+                <input type="text" id="formHotelPartner" placeholder="VD: KS Mường Thanh / KS Novotel / Anh Tuấn Taxi..." class="input-dark w-full rounded-lg px-3 py-2 text-white font-medium" />
+                <div class="flex flex-wrap gap-1 mt-1.5">
+                  <span class="text-[10px] text-slate-400 self-center mr-1">Điền nhanh:</span>
+                  <button type="button" onclick="setPartnerPreset('KS Mường Thanh Luxury', 10)" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700">KS Mường Thanh (10%)</button>
+                  <button type="button" onclick="setPartnerPreset('KS Novotel Nha Trang', 15)" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700">KS Novotel (15%)</button>
+                  <button type="button" onclick="setPartnerPreset('Lễ tân KS', 10)" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-slate-700">Lễ tân KS (10%)</button>
+                  <button type="button" onclick="setPartnerPreset('Bác tài Taxi / Grab', 20)" class="text-[10px] px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-purple-300 border border-slate-700">Bác tài Taxi (20%)</button>
+                </div>
+              </div>
+
+              <!-- % Trích Hoa Hồng -->
+              <div class="sm:col-span-3">
+                <label class="block text-slate-300 font-semibold mb-1">
+                  % Trích hoa hồng
+                </label>
+                <div class="flex items-center gap-1.5">
+                  <input type="number" id="formCommissionRate" min="0" max="100" step="1" value="10" oninput="recalcCommissionFromRate()" class="input-dark w-full rounded-lg px-2.5 py-2 font-mono-code text-amber-300 font-bold text-center text-sm" placeholder="10" />
+                  <span class="text-amber-400 font-black text-sm">%</span>
+                </div>
+                <div class="flex gap-1 mt-1.5">
+                  <button type="button" onclick="setCommissionRate(10)" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">10%</button>
+                  <button type="button" onclick="setCommissionRate(15)" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">15%</button>
+                  <button type="button" onclick="setCommissionRate(20)" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">20%</button>
+                  <button type="button" onclick="setCommissionRate(25)" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 hover:bg-slate-700">25%</button>
+                </div>
+              </div>
+
+              <!-- Số Tiền Hoa Hồng Tương Ứng -->
+              <div class="sm:col-span-3">
+                <label class="block text-amber-300 font-semibold mb-1">
+                  Tiền hoa hồng chi (VNĐ)
+                </label>
+                <input type="number" id="formHotelCommission" min="0" step="5000" oninput="recalcCommissionFromAmount()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-amber-300 font-black bg-slate-900/90 text-sm" placeholder="0" />
+                <span id="commissionCalcHint" class="text-[10px] text-slate-400 block mt-1 italic">= 10% × Tiền thuê</span>
+              </div>
             </div>
           </div>
         </div>
@@ -681,18 +733,19 @@
           </div>
         </div>
 
-        <!-- ==================== BƯỚC 3: CHI PHÍ & TIỀN CỌC (1 XE × ĐÊM = TIỀN) ==================== -->
-        <div class="p-4 rounded-xl bg-[#0f151c] border border-amber-500/30 space-y-3">
+        <!-- ==================== BƯỚC 3: CHI PHÍ & DÒNG TIỀN (CHUYỂN CÔNG TY vs NHÂN VIÊN NHẬN) ==================== -->
+        <div class="p-4 rounded-xl bg-[#0f151c] border border-amber-500/30 space-y-3.5">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2 text-xs font-bold uppercase text-amber-300">
               <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-[11px] font-extrabold border border-amber-500/30">3</span>
-              <span>Chi Phí Thuê & Tiền Khách Cọc (1 Xe × Đêm = Tiền)</span>
+              <span>Chi Phí Thuê Xe & Dòng Tiền Thu Nhận</span>
             </div>
             <div id="formulaBadge" class="font-mono-code font-bold text-xs text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2.5 py-1 rounded-lg">
               1 xe × 2 đêm = 360.000 ₫
             </div>
           </div>
 
+          <!-- Công thức tính tiền: Đơn giá x Số đêm = Tổng tiền -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label class="block text-slate-300 font-semibold mb-1">Đơn giá thuê / đêm (VNĐ) *</label>
@@ -711,24 +764,52 @@
             </div>
           </div>
 
-          <!-- Tiền khách cọc & Còn lại phải thu -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2.5 border-t border-slate-800/80 items-center">
-            <div>
-              <label class="block text-amber-300 font-semibold mb-1">
-                <i class="fa-solid fa-hand-holding-dollar mr-1"></i>Tiền khách cọc trước (VNĐ)
-              </label>
-              <input type="number" id="formDepositAmount" min="0" step="10000" value="150000" oninput="updateSummaryPreview()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-amber-300 font-bold" placeholder="0" />
-            </div>
-            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex justify-between items-center">
-              <div>
-                <div class="text-[11px] text-slate-400">Tổng tiền đơn: <strong id="modalTotalText" class="font-mono-code text-white font-bold">0 ₫</strong></div>
-                <div class="text-[11px] text-amber-400 mt-0.5">Khách đã cọc: <strong id="modalDepositText" class="font-mono-code text-amber-300">0 ₫</strong></div>
+          <!-- 2 BOX DÒNG TIỀN: TIỀN CỌC VÀ TIỀN THUÊ CÒN LẠI (PHÂN ĐỊNH RÕ: CHUYỂN CÔNG TY vs NHÂN VIÊN NHẬN) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2.5 border-t border-slate-800/80">
+            
+            <!-- BOX 1: TIỀN KHÁCH CỌC TRƯỚC -->
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-amber-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="text-amber-300 font-bold text-xs uppercase flex items-center gap-1">
+                  <i class="fa-solid fa-hand-holding-dollar"></i> Tiền khách cọc trước
+                </label>
+                <span class="text-[10px] text-slate-400">Thanh toán lúc đặt</span>
               </div>
-              <div class="text-right">
-                <div class="text-[10px] uppercase font-bold text-sky-400">Còn lại phải thu</div>
-                <div id="modalRemainingText" class="font-mono-code text-lg font-black text-sky-300">0 ₫</div>
+              <input type="number" id="formDepositAmount" min="0" step="10000" value="150000" oninput="updateSummaryPreview()" class="input-dark w-full rounded-lg px-3 py-2 font-mono-code text-amber-300 font-bold text-base" placeholder="0" />
+              
+              <div class="pt-1.5 border-t border-slate-800 space-y-1.5 text-xs">
+                <label class="block text-slate-300 font-semibold text-[11px]">Nơi nhận tiền cọc:</label>
+                <select id="formDepositMethod" onchange="handleDepositMethodChange()" class="input-dark w-full rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                  <option value="company" selected>🏢 Chuyển khoản Công ty (QR / TK MB DBP)</option>
+                  <option value="staff">🛵 Nhân viên nhận tiền (Tiền mặt / NV thu)</option>
+                </select>
+                <input type="text" id="formDepositReceiver" value="TK Công ty (MB 0905888999)" placeholder="Ghi rõ người nhận / STK nhận" class="input-dark w-full rounded-lg px-2.5 py-1.5 text-[11px] text-slate-300 font-mono-code" />
               </div>
             </div>
+
+            <!-- BOX 2: TIỀN THUÊ CÒN LẠI (KHI GIAO XE) -->
+            <div class="p-3 rounded-xl bg-slate-900/90 border border-sky-500/30 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-sky-400 flex items-center gap-1">
+                  <i class="fa-solid fa-receipt"></i> Số tiền còn lại phải thu
+                </span>
+                <span class="text-[10px] text-slate-400">Thu khi giao nhận xe</span>
+              </div>
+              <div class="flex items-baseline justify-between py-1">
+                <div id="modalRemainingText" class="font-mono-code text-xl font-black text-sky-300">0 ₫</div>
+                <div class="text-[11px] text-slate-400">Tổng: <strong id="modalTotalText" class="text-white">0 ₫</strong></div>
+              </div>
+
+              <div class="pt-1.5 border-t border-slate-800 space-y-1.5 text-xs">
+                <label class="block text-slate-300 font-semibold text-[11px]">Hình thức thu tiền còn lại:</label>
+                <select id="formPaymentMethod" onchange="handlePaymentMethodChange()" class="input-dark w-full rounded-lg px-2.5 py-1.5 text-xs font-semibold">
+                  <option value="company">🏢 Chuyển khoản Công ty (Khách quét VietQR DBP)</option>
+                  <option value="staff" selected>🛵 Nhân viên nhận tiền (Tiền mặt khi giao xe)</option>
+                </select>
+                <input type="text" id="formPaymentReceiver" value="Thắng (nv1@didibaophe.vn)" placeholder="Ghi rõ NV phụ trách thu tiền" class="input-dark w-full rounded-lg px-2.5 py-1.5 text-[11px] text-slate-300 font-mono-code" />
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -1029,7 +1110,10 @@
                     <td id="printExtCost" class="py-2 px-3 text-right font-mono-code font-bold text-purple-800">0 ₫</td>
                   </tr>
                   <tr class="bg-amber-50/60">
-                    <td class="py-2 px-3 font-semibold text-amber-900">3. Khách đã cọc giữ xe (Đã thanh toán)</td>
+                    <td class="py-2 px-3 font-semibold text-amber-900">
+                      <div>3. Khách đã cọc giữ xe (Đã thanh toán)</div>
+                      <div id="printDepositMethodBadge" class="text-[10px] font-normal text-slate-500 mt-0.5">🏢 Chuyển khoản Công ty (QR MB)</div>
+                    </td>
                     <td id="printDepositAmount" class="py-2 px-3 text-right font-mono-code font-bold text-amber-800">- 200.000 ₫</td>
                   </tr>
                   <tr class="bg-slate-100 font-bold border-t-2 border-slate-300">
@@ -1039,15 +1123,22 @@
                 </tbody>
               </table>
 
-              <!-- Dòng Số Tiền Còn Phải Thu Khách -->
+              <!-- Dòng Số Tiền Còn Phải Thu Khách & Hình thức thu -->
               <div class="p-3 bg-amber-100/70 border-t-2 border-amber-400 flex items-center justify-between">
                 <div>
                   <span class="text-[11px] font-bold uppercase text-slate-800 block">SỐ TIỀN CÒN PHẢI THU:</span>
-                  <span id="printPaymentStatus" class="text-[10px] text-slate-600">Thu khi giao nhận xe</span>
+                  <span id="printPaymentStatus" class="text-[10px] text-slate-600 block">Thu khi giao nhận xe</span>
+                  <span id="printPaymentMethodBadge" class="text-[10px] font-semibold text-sky-900 block mt-0.5">Hình thức: 🛵 Nhân viên nhận tiền mặt</span>
                 </div>
                 <div id="printRemainingAmount" class="font-mono-code font-black text-lg text-rose-700">
                   340.000 ₫
                 </div>
+              </div>
+
+              <!-- Dòng thông tin đối tác & hoa hồng (nếu có) -->
+              <div id="printPartnerBox" class="p-2 bg-slate-100 border-t border-slate-300 text-[10px] text-slate-600 flex justify-between items-center">
+                <span><i class="fa-solid fa-handshake text-amber-700 mr-1"></i>Đối tác gửi khách: <strong id="printPartnerName" class="text-slate-900">--</strong></span>
+                <span id="printPartnerCommission" class="font-mono-code font-bold text-amber-800">--</span>
               </div>
             </div>
 
@@ -1172,7 +1263,26 @@
           });
         }
         const b = localStorage.getItem(STORAGE_KEYS.BOOKINGS);
-        if (b) bookings = JSON.parse(b);
+        if (b) {
+          bookings = JSON.parse(b);
+          // Chuẩn hóa và di chuyển dữ liệu đối tác, % hoa hồng, nơi thu tiền (Công ty vs NV)
+          bookings.forEach(item => {
+            if (!item.partnerName && item.hotelPartner) item.partnerName = item.hotelPartner;
+            if (item.hotelPartner && !item.partnerName) item.partnerName = item.hotelPartner;
+            if (item.commissionAmount === undefined && item.hotelCommission !== undefined) item.commissionAmount = item.hotelCommission;
+            if (item.commissionRate === undefined) {
+              if (item.baseAmount && item.commissionAmount) {
+                item.commissionRate = Math.round((item.commissionAmount / item.baseAmount) * 100);
+              } else {
+                item.commissionRate = (item.partnerName || item.hotelPartner) ? 10 : 0;
+              }
+            }
+            if (!item.depositMethod) item.depositMethod = 'company';
+            if (!item.depositReceiver) item.depositReceiver = item.depositMethod === 'company' ? 'TK Công ty (MB 0905888999)' : (item.deliveryStaff || 'Thắng (NV)');
+            if (!item.paymentMethod) item.paymentMethod = item.paidInFull ? 'staff' : 'company';
+            if (!item.paymentReceiver) item.paymentReceiver = item.paymentMethod === 'company' ? 'TK Công ty (MB 0905888999)' : (item.deliveryStaff || 'Thắng (NV)');
+          });
+        }
         const l = localStorage.getItem(STORAGE_KEYS.MAINTENANCE);
         if (l) maintenanceLogs = JSON.parse(l);
         const a = localStorage.getItem(STORAGE_KEYS.APPROVALS);
@@ -1325,8 +1435,11 @@
         email: 'tranquocbao@gmail.com',
         orderNote: 'Khách lấy thêm 2 mũ bảo hiểm 3/4',
         bookingSource: 'hotel',
+        partnerName: 'KS Mường Thanh Luxury',
+        commissionRate: 10,
+        commissionAmount: 54000,
         hotelPartner: 'KS Mường Thanh Luxury',
-        hotelCommission: 30000,
+        hotelCommission: 54000,
         motorcycleId: 'XM-01',
         startDate: '2026-11-02',
         startTime: '08:00',
@@ -1339,6 +1452,10 @@
         rentalNights: 3,
         baseAmount: 540000,
         depositAmount: 200000,
+        depositMethod: 'company',
+        depositReceiver: 'TK Công ty (MB 0905888999)',
+        paymentMethod: 'staff',
+        paymentReceiver: 'Thắng (nv1@didibaophe.vn)',
         extensionDays: 1,
         extensionCost: 180000,
         paidInFull: false,
@@ -1356,6 +1473,9 @@
         email: 'phuonglan.le@gmail.com',
         orderNote: 'Khách gọi Hotline đặt trước',
         bookingSource: 'direct',
+        partnerName: '',
+        commissionRate: 0,
+        commissionAmount: 0,
         hotelPartner: '',
         hotelCommission: 0,
         sourceNote: 'Khách gọi Hotline đặt trước',
@@ -1371,6 +1491,10 @@
         rentalNights: 3,
         baseAmount: 390000,
         depositAmount: 150000,
+        depositMethod: 'company',
+        depositReceiver: 'TK Công ty (MB 0905888999)',
+        paymentMethod: 'staff',
+        paymentReceiver: 'Linh (nv2@didibaophe.vn)',
         extensionDays: 0,
         extensionCost: 0,
         paidInFull: false,
@@ -1387,9 +1511,12 @@
         idCard: '079201007788',
         email: 'nhatnam.travel@gmail.com',
         orderNote: 'Giao tại Ga Cam Ranh, khách bay từ Hà Nội vào',
-        bookingSource: 'direct',
-        hotelPartner: '',
-        hotelCommission: 0,
+        bookingSource: 'tour',
+        partnerName: 'Anh Tuấn Taxi Cam Ranh',
+        commissionRate: 15,
+        commissionAmount: 120000,
+        hotelPartner: 'Anh Tuấn Taxi Cam Ranh',
+        hotelCommission: 120000,
         sourceNote: 'Khách gọi Zalo đặt trước 2 tuần',
         motorcycleId: 'XM-03',
         startDate: '2026-11-18',
@@ -1403,6 +1530,10 @@
         rentalNights: 4,
         baseAmount: 800000,
         depositAmount: 300000,
+        depositMethod: 'company',
+        depositReceiver: 'TK Công ty (MB 0905888999)',
+        paymentMethod: 'company',
+        paymentReceiver: 'TK Công ty (MB 0905888999)',
         extensionDays: 0,
         extensionCost: 0,
         paidInFull: false,
@@ -1419,9 +1550,12 @@
         idCard: '079199003322',
         email: 'quynhmai.nt@gmail.com',
         orderNote: 'Khách đi tàu hỏa tới Ga Nha Trang, cần xe cốp rộng',
-        bookingSource: 'direct',
-        hotelPartner: '',
-        hotelCommission: 0,
+        bookingSource: 'hotel',
+        partnerName: 'KS Novotel Nha Trang',
+        commissionRate: 10,
+        commissionAmount: 60000,
+        hotelPartner: 'KS Novotel Nha Trang',
+        hotelCommission: 60000,
         sourceNote: 'Khách đặt trước 1 tháng cho kỳ nghỉ',
         motorcycleId: 'XM-04',
         startDate: '2026-11-28',
@@ -1435,6 +1569,10 @@
         rentalNights: 4,
         baseAmount: 600000,
         depositAmount: 250000,
+        depositMethod: 'company',
+        depositReceiver: 'TK Công ty (MB 0905888999)',
+        paymentMethod: 'staff',
+        paymentReceiver: 'Linh (nv2@didibaophe.vn)',
         extensionDays: 0,
         extensionCost: 0,
         paidInFull: false,
@@ -1452,6 +1590,9 @@
         email: 'haidang.nt@gmail.com',
         orderNote: 'Khách đến bãi DBP thuê trực tiếp',
         bookingSource: 'direct',
+        partnerName: '',
+        commissionRate: 0,
+        commissionAmount: 0,
         hotelPartner: '',
         hotelCommission: 0,
         sourceNote: 'Khách đến bãi DBP thuê',
@@ -1467,6 +1608,10 @@
         rentalNights: 3,
         baseAmount: 600000,
         depositAmount: 600000,
+        depositMethod: 'staff',
+        depositReceiver: 'Thắng (nv1@didibaophe.vn)',
+        paymentMethod: 'staff',
+        paymentReceiver: 'Thắng (nv1@didibaophe.vn)',
         extensionDays: 0,
         extensionCost: 0,
         paidInFull: true,
@@ -1645,39 +1790,69 @@
       if (tab === 'advance') renderAdvanceBookings();
     }
 
-    // TÍNH KPI DOANH THU & BẢO DƯỠNG
+    // TÍNH KPI DOANH THU & BẢO DƯỠNG (PHÂN ĐỊNH DÒNG TIỀN VÀO CTY vs NV GIỮ & HOA HỒNG)
     function renderKPIs() {
       let baseSum = 0;
       let extSum = 0;
       let collectedSum = 0;
       let depositSum = 0;
       let receivableSum = 0;
+      let companyCollected = 0;
+      let staffCollected = 0;
+      let totalCommission = 0;
 
       bookings.forEach(b => {
         const total = Number(b.baseAmount || 0) + Number(b.extensionCost || 0);
         baseSum += Number(b.baseAmount || 0);
         extSum += Number(b.extensionCost || 0);
-        depositSum += Number(b.depositAmount || 0);
-        const paid = b.paidInFull ? total : Number(b.depositAmount || 0);
+        const dep = Number(b.depositAmount || 0);
+        depositSum += dep;
+        const paid = b.paidInFull ? total : dep;
         const remain = Math.max(0, total - paid);
         collectedSum += paid;
         receivableSum += remain;
+
+        // Phân định dòng tiền: Chuyển khoản Công ty vs Nhân viên nhận tiền mặt
+        const depMethod = b.depositMethod || 'company';
+        if (depMethod === 'company') {
+          companyCollected += dep;
+        } else {
+          staffCollected += dep;
+        }
+
+        if (b.paidInFull) {
+          const remainCollected = Math.max(0, total - dep);
+          const payMethod = b.paymentMethod || 'staff';
+          if (payMethod === 'company') {
+            companyCollected += remainCollected;
+          } else {
+            staffCollected += remainCollected;
+          }
+        }
+
+        // Tính tổng trích hoa hồng đối tác
+        const comm = Number(b.commissionAmount !== undefined ? b.commissionAmount : (b.hotelCommission || 0));
+        totalCommission += comm;
       });
 
       const totalRev = baseSum + extSum;
       const totalMaint = maintenanceLogs.reduce((acc, m) => acc + Number(m.cost || 0), 0);
-      const netProfit = totalRev - totalMaint;
+      const netProfit = totalRev - totalMaint - totalCommission;
       const dueBikesList = motorcycles.filter(m => (m.nextOilKm - m.currentKm) <= 200 || m.currentKm >= m.nextOilKm);
       const dueBikes = dueBikesList.length;
 
       document.getElementById('kpiTotalRevenue').textContent = formatVND(totalRev);
       document.getElementById('kpiRevenueSub').textContent = `Thuê gốc: ${formatVND(baseSum)} | Phát sinh: ${formatVND(extSum)}`;
       document.getElementById('kpiCollected').textContent = formatVND(collectedSum);
-      document.getElementById('kpiDepositSub').textContent = `Tiền cọc giữ xe: ${formatVND(depositSum)}`;
+      document.getElementById('kpiDepositSub').textContent = `🏢 Vào Cty: ${formatVND(companyCollected)} | 🛵 NV giữ: ${formatVND(staffCollected)}`;
       document.getElementById('kpiReceivable').textContent = formatVND(receivableSum);
       document.getElementById('kpiMaintCost').textContent = formatVND(totalMaint);
       document.getElementById('kpiMaintAlertSub').textContent = `${dueBikes} xe sắp/đến hạn thay nhớt`;
       document.getElementById('kpiNetProfit').textContent = formatVND(netProfit);
+      const elNetSub = document.getElementById('kpiNetProfitSub');
+      if (elNetSub) {
+        elNetSub.textContent = `Bảo trì: -${formatVND(totalMaint)} | Hoa hồng: -${formatVND(totalCommission)}`;
+      }
 
       document.getElementById('badgeMaintenance').textContent = dueBikes;
       const pendingCount = approvalRequests.filter(r => r.status === 'Pending').length;
@@ -1715,14 +1890,25 @@
       const dateType = document.getElementById('filterDateType').value;
       const dateVal = document.getElementById('filterDateValue').value;
       const statusFilter = document.getElementById('filterStatus').value;
+      const payMethodFilter = document.getElementById('filterPaymentMethod') ? document.getElementById('filterPaymentMethod').value : 'ALL';
 
       const filtered = bookings.filter(b => {
         const bike = motorcycles.find(m => m.id === b.motorcycleId) || {};
-        const searchTarget = `${b.id} ${b.customerName} ${b.phone} ${b.idCard || ''} ${b.email || ''} ${bike.model} ${bike.licensePlate} ${b.pickupLocation} ${b.deliveryStaff} ${b.returnStaff || ''} ${b.bookingSource || ''} ${b.hotelPartner || ''} ${b.orderNote || b.sourceNote || ''}`.toLowerCase();
+        const searchTarget = `${b.id} ${b.customerName} ${b.phone} ${b.idCard || ''} ${b.email || ''} ${bike.model} ${bike.licensePlate} ${b.pickupLocation} ${b.deliveryStaff} ${b.returnStaff || ''} ${b.bookingSource || ''} ${b.partnerName || ''} ${b.hotelPartner || ''} ${b.depositReceiver || ''} ${b.paymentReceiver || ''} ${b.orderNote || b.sourceNote || ''}`.toLowerCase();
         if (kw && !searchTarget.includes(kw)) return false;
         if (statusFilter !== 'ALL' && b.bookingStatus !== statusFilter) return false;
         if (dateVal && dateType !== 'all') {
           if (b[dateType] !== dateVal) return false;
+        }
+        if (payMethodFilter === 'company') {
+          const isComp = (b.depositMethod === 'company') || (b.paymentMethod === 'company');
+          if (!isComp) return false;
+        } else if (payMethodFilter === 'staff') {
+          const isStaff = (b.depositMethod === 'staff') || (b.paymentMethod === 'staff');
+          if (!isStaff) return false;
+        } else if (payMethodFilter === 'partner') {
+          const hasPartner = ((b.partnerName || b.hotelPartner) && Number(b.commissionAmount || b.hotelCommission || 0) > 0) || b.bookingSource === 'hotel' || b.bookingSource === 'tour';
+          if (!hasPartner) return false;
         }
         return true;
       });
@@ -1753,6 +1939,18 @@
           ? `<i class="fa-solid fa-pen-to-square"></i> Sửa`
           : `<i class="fa-solid fa-paper-plane"></i> Xin sửa`;
 
+        const partnerName = b.partnerName || b.hotelPartner;
+        const commRate = b.commissionRate || 10;
+        const commAmt = b.commissionAmount !== undefined ? b.commissionAmount : (b.hotelCommission || 0);
+
+        const depMethodBadge = (b.depositMethod === 'company')
+          ? `<span class="inline-flex items-center gap-0.5 text-[9px] px-1 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30" title="Cọc chuyển khoản Cty: ${b.depositReceiver || 'TK MB'}">🏢 TK Cty</span>`
+          : `<span class="inline-flex items-center gap-0.5 text-[9px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="Cọc tiền mặt NV nhận: ${b.depositReceiver || 'NV thu'}">🛵 NV nhận</span>`;
+
+        const payMethodBadge = (b.paymentMethod === 'company')
+          ? `<span class="inline-flex items-center gap-0.5 text-[9px] px-1 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30" title="Thanh toán Cty qua VietQR: ${b.paymentReceiver || 'TK MB'}">🏢 TK Cty</span>`
+          : `<span class="inline-flex items-center gap-0.5 text-[9px] px-1 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" title="NV nhận tiền mặt: ${b.paymentReceiver || 'NV thu'}">🛵 NV nhận</span>`;
+
         return `
           <tr class="hover:bg-slate-800/40 transition align-top">
             <td class="py-3.5 px-3">
@@ -1766,12 +1964,20 @@
               <div class="font-bold text-white text-sm">${b.customerName}</div>
               <div class="font-mono-code text-amber-300 text-xs mt-0.5"><i class="fa-solid fa-phone mr-1 text-[10px]"></i>${b.phone}</div>
               ${b.idCard ? `<div class="text-[11px] text-slate-300 font-mono-code mt-0.5"><i class="fa-solid fa-id-card mr-1 text-[10px] text-amber-400"></i>CCCD: ${b.idCard}</div>` : ''}
-              <div class="mt-1">
-                ${b.bookingSource === 'hotel'
-                  ? `<span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold" title="Khách sạn gửi: ${b.hotelPartner || 'Đối tác KS'}"><i class="fa-solid fa-hotel"></i> KS: ${b.hotelPartner || 'Đối tác KS'}</span>`
-                  : `<span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold"><i class="fa-solid fa-user-check"></i> Khách trực tiếp</span>`
-                }
-              </div>
+              ${partnerName ? `
+                <div class="mt-1 space-y-0.5">
+                  <span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-semibold" title="Đối tác giới thiệu: ${partnerName}">
+                    <i class="fa-solid fa-handshake"></i> ${partnerName}
+                  </span>
+                  <div class="text-[10px] text-amber-400 font-mono-code">Hoa hồng: <strong class="text-amber-300">${commRate}%</strong> (${formatVND(commAmt)})</div>
+                </div>
+              ` : `
+                <div class="mt-1">
+                  <span class="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                    <i class="fa-solid fa-user-check"></i> Khách trực tiếp
+                  </span>
+                </div>
+              `}
               ${(b.orderNote || b.sourceNote) ? `<div class="text-[10px] text-slate-400 italic mt-1 max-w-[170px] truncate" title="${b.orderNote || b.sourceNote}"><i class="fa-regular fa-note-sticky mr-1 text-slate-500"></i>${b.orderNote || b.sourceNote}</div>` : ''}
             </td>
 
@@ -1809,14 +2015,20 @@
             </td>
 
             <td class="py-3.5 px-3 font-mono-code">
-              <div class="text-[11px] text-slate-400">Tiền thuê (1 xe × đêm): <strong class="text-white">${formatVND(b.baseAmount)}</strong></div>
-              <div class="text-xs text-amber-300 mt-0.5">Tiền cọc: <strong>${formatVND(b.depositAmount)}</strong></div>
+              <div class="text-[11px] text-slate-400">Thuê (1 xe × đêm): <strong class="text-white">${formatVND(b.baseAmount)}</strong></div>
+              <div class="text-xs text-amber-300 mt-0.5 flex items-center justify-between">
+                <span>Cọc: <strong>${formatVND(b.depositAmount)}</strong></span>
+                ${depMethodBadge}
+              </div>
               ${b.extensionDays > 0 ? `<div class="text-[11px] text-purple-300">Phát sinh: +${formatVND(b.extensionCost)}</div>` : ''}
               <div class="text-xs font-bold text-white mt-1 border-t border-slate-800 pt-1">Tổng đơn: ${formatVND(total)}</div>
-              ${remain === 0
-                ? `<span class="inline-block mt-1 px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-sans font-bold">✓ Đã thu đủ 100%</span>`
-                : `<span class="inline-block mt-1 px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-sans font-bold">Còn thu: ${formatVND(remain)}</span>`
-              }
+              <div class="mt-1 flex items-center justify-between">
+                ${remain === 0
+                  ? `<span class="inline-block px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-sans font-bold">✓ Đã thu đủ</span>`
+                  : `<span class="inline-block px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[10px] font-sans font-bold">Còn: ${formatVND(remain)}</span>`
+                }
+                ${payMethodBadge}
+              </div>
             </td>
 
             <td class="py-3.5 px-3 text-center">
@@ -1867,6 +2079,8 @@
       document.getElementById('filterDateType').value = 'all';
       document.getElementById('filterDateValue').value = '';
       document.getElementById('filterStatus').value = 'ALL';
+      const elPay = document.getElementById('filterPaymentMethod');
+      if (elPay) elPay.value = 'ALL';
       renderBookings();
     }
 
@@ -1899,6 +2113,23 @@
     function quickHandoverAndCollect(bookingId) {
       const b = bookings.find(x => x.id === bookingId);
       if (!b) return;
+      const total = Number(b.baseAmount || 0) + Number(b.extensionCost || 0);
+      const paid = b.paidInFull ? total : Number(b.depositAmount || 0);
+      const remain = Math.max(0, total - paid);
+
+      const choice = prompt(
+        `Xác nhận bàn giao xe đơn ${b.id} (${b.customerName}) & THU ĐỦ ${formatVND(remain)}:\n\n` +
+        `Nhập [ 1 ] : Khách quét QR chuyển vào TK CÔNG TY DIDIBAOPHE VN (MB 0905888999)\n` +
+        `Nhập [ 2 ] : Khách trả TIỀN MẶT cho Nhân viên giao xe (${currentUser.email})\n\n` +
+        `Vui lòng nhập 1 hoặc 2:`,
+        b.paymentMethod === 'company' ? '1' : '2'
+      );
+      if (choice === null) return;
+
+      const isCompany = (choice.trim() === '1');
+      const paymentMethod = isCompany ? 'company' : 'staff';
+      const paymentReceiver = isCompany ? 'TK Công ty (MB 0905888999)' : (b.deliveryStaff || `Thắng (${currentUser.email})`);
+
       const bike = motorcycles.find(m => m.id === b.motorcycleId);
       if (bike) {
         bike.status = 'Đang chạy';
@@ -1906,8 +2137,13 @@
       }
       applyOrRequestChange(
         b,
-        { bookingStatus: 'Ongoing', paidInFull: true },
-        `Nhân viên ${currentUser.email} xác nhận đã giao xe cho khách và thu đủ 100% tiền thuê.`
+        {
+          bookingStatus: 'Ongoing',
+          paidInFull: true,
+          paymentMethod: paymentMethod,
+          paymentReceiver: paymentReceiver
+        },
+        `Giao xe cho khách và thu đủ tiền còn lại (${isCompany ? '🏢 Khách quét QR vào TK Công ty' : '🛵 Nhân viên nhận tiền mặt'}).`
       );
     }
 
@@ -2173,12 +2409,26 @@
                 </div>
               </div>
 
-              <!-- Tài chính -->
-              <div class="mt-2.5 flex items-center justify-between text-xs font-mono-code px-2">
-                <span class="text-slate-400">Đã cọc: <strong class="text-amber-300">${formatVND(b.depositAmount)}</strong></span>
-                <span class="${remain === 0 ? 'text-emerald-400 font-bold' : 'text-rose-300 font-bold'}">
-                  ${remain === 0 ? '✓ Đã thanh toán 100%' : `Còn thu khi giao: ${formatVND(remain)}`}
-                </span>
+              <!-- Tài chính & Phân định Dòng tiền -->
+              <div class="mt-2.5 p-2 rounded-lg bg-slate-900/90 border border-slate-800 text-xs font-mono-code space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">Đã cọc: <strong class="text-amber-300">${formatVND(b.depositAmount)}</strong></span>
+                  <span class="text-[10px] px-1.5 py-0.5 rounded ${b.depositMethod === 'company' ? 'bg-sky-500/20 text-sky-300 border border-sky-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
+                    ${b.depositMethod === 'company' ? '🏢 Vào TK Cty' : '🛵 NV nhận tiền'}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between pt-1 border-t border-slate-800">
+                  <span class="text-slate-400">Còn thu: <strong class="${remain === 0 ? 'text-emerald-300' : 'text-rose-300'}">${remain === 0 ? '0 ₫ (Đã đủ)' : formatVND(remain)}</strong></span>
+                  <span class="text-[10px] text-slate-400 font-sans">
+                    ${b.paymentMethod === 'company' ? '🏢 Quét VietQR' : '🛵 Tiền mặt khi giao'}
+                  </span>
+                </div>
+                ${(b.partnerName || b.hotelPartner) ? `
+                  <div class="pt-1 border-t border-slate-800 flex items-center justify-between text-[11px] font-sans">
+                    <span class="text-amber-300 truncate" title="Đối tác: ${b.partnerName || b.hotelPartner}"><i class="fa-solid fa-handshake mr-1 text-amber-400"></i>${b.partnerName || b.hotelPartner}</span>
+                    <span class="font-mono-code font-bold text-amber-300 shrink-0">${b.commissionRate || 10}% (${formatVND(b.commissionAmount !== undefined ? b.commissionAmount : (b.hotelCommission || 0))})</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
@@ -2607,6 +2857,47 @@
         document.getElementById('printPaymentStatus').textContent = 'Thu khi giao nhận xe';
       }
 
+      // Cập nhật phương thức nhận tiền cọc trên phiếu in
+      const elDepBadge = document.getElementById('printDepositMethodBadge');
+      if (elDepBadge) {
+        if (b.depositMethod === 'company') {
+          elDepBadge.innerHTML = `🏢 Chuyển khoản Công ty (${b.depositReceiver || 'TK MB 0905888999'})`;
+        } else {
+          elDepBadge.innerHTML = `🛵 Nhân viên nhận tiền mặt (${b.depositReceiver || b.deliveryStaff || 'Thắng NV'})`;
+        }
+      }
+
+      // Cập nhật phương thức thu tiền còn lại trên phiếu in
+      const elPayBadge = document.getElementById('printPaymentMethodBadge');
+      if (elPayBadge) {
+        if (b.paidInFull || remain === 0) {
+          elPayBadge.innerHTML = `Hình thức: <strong class="text-emerald-800">${b.paymentMethod === 'company' ? '🏢 Đã chuyển khoản Công ty' : '🛵 Đã thanh toán tiền mặt cho nhân viên'}</strong>`;
+        } else {
+          if (b.paymentMethod === 'company') {
+            elPayBadge.innerHTML = `Hình thức: <strong class="text-sky-800">🏢 Chuyển khoản Công ty (Quét VietQR bên cạnh)</strong>`;
+          } else {
+            elPayBadge.innerHTML = `Hình thức: <strong class="text-slate-800">🛵 Tiền mặt cho NV giao xe: ${b.paymentReceiver || b.deliveryStaff || 'Thắng NV'}</strong>`;
+          }
+        }
+      }
+
+      // Cập nhật dòng đối tác & hoa hồng trên phiếu in
+      const partnerBox = document.getElementById('printPartnerBox');
+      const partnerName = b.partnerName || b.hotelPartner;
+      if (partnerBox) {
+        if (partnerName) {
+          partnerBox.classList.remove('hidden');
+          const elPName = document.getElementById('printPartnerName');
+          if (elPName) elPName.textContent = partnerName;
+          const commRate = b.commissionRate || 10;
+          const commAmt = b.commissionAmount !== undefined ? b.commissionAmount : (b.hotelCommission || 0);
+          const elPComm = document.getElementById('printPartnerCommission');
+          if (elPComm) elPComm.textContent = `Hoa hồng: ${commRate}% (${formatVND(commAmt)})`;
+        } else {
+          partnerBox.classList.add('hidden');
+        }
+      }
+
       document.getElementById('printSignStaff').textContent = b.deliveryStaff || 'Đại diện DIDIBAOPHE.VN';
       document.getElementById('printSignCustomer').textContent = b.customerName;
 
@@ -2673,10 +2964,69 @@
       const srcEl = document.getElementById('formBookingSource');
       const box = document.getElementById('hotelPartnerBox');
       if (!srcEl || !box) return;
-      if (srcEl.value === 'hotel') {
+      if (srcEl.value === 'hotel' || srcEl.value === 'tour') {
         box.classList.remove('hidden');
       } else {
         box.classList.add('hidden');
+      }
+    }
+
+    function setPartnerPreset(name, rate) {
+      const p = document.getElementById('formHotelPartner');
+      if (p) p.value = name;
+      setCommissionRate(rate);
+    }
+
+    function setCommissionRate(rate) {
+      const r = document.getElementById('formCommissionRate');
+      if (r) r.value = rate;
+      recalcCommissionFromRate();
+    }
+
+    function recalcCommissionFromRate() {
+      const rate = Number(document.getElementById('formCommissionRate')?.value || 0);
+      const base = Number(document.getElementById('formBaseAmount')?.value || 0);
+      const comm = Math.round(base * (rate / 100));
+      const elComm = document.getElementById('formHotelCommission');
+      if (elComm) elComm.value = comm;
+      const hint = document.getElementById('commissionCalcHint');
+      if (hint) hint.textContent = `= ${rate}% × Tiền thuê (${formatVND(base)})`;
+    }
+
+    function recalcCommissionFromAmount() {
+      const comm = Number(document.getElementById('formHotelCommission')?.value || 0);
+      const base = Number(document.getElementById('formBaseAmount')?.value || 0);
+      let rate = 0;
+      if (base > 0) {
+        rate = Math.round((comm / base) * 100);
+      }
+      const elRate = document.getElementById('formCommissionRate');
+      if (elRate) elRate.value = rate;
+      const hint = document.getElementById('commissionCalcHint');
+      if (hint) hint.textContent = `= ${rate}% × Tiền thuê (${formatVND(base)})`;
+    }
+
+    function handleDepositMethodChange() {
+      const method = document.getElementById('formDepositMethod').value;
+      const rec = document.getElementById('formDepositReceiver');
+      if (!rec) return;
+      if (method === 'company') {
+        rec.value = 'TK Công ty (MB 0905888999)';
+      } else {
+        const staff = document.getElementById('formDeliveryStaff').value.trim() || `Thắng (${currentUser.email})`;
+        rec.value = staff;
+      }
+    }
+
+    function handlePaymentMethodChange() {
+      const method = document.getElementById('formPaymentMethod').value;
+      const rec = document.getElementById('formPaymentReceiver');
+      if (!rec) return;
+      if (method === 'company') {
+        rec.value = 'TK Công ty (MB 0905888999)';
+      } else {
+        const staff = document.getElementById('formDeliveryStaff').value.trim() || `Thắng (${currentUser.email})`;
+        rec.value = staff;
       }
     }
 
@@ -2717,6 +3067,7 @@
       const rate = Number(document.getElementById('formDailyRate').value || 150000);
       document.getElementById('formBaseAmount').value = nights * rate;
       updateSummaryPreview();
+      recalcCommissionFromRate();
     }
 
     function handleNightsManualInput() {
@@ -2731,6 +3082,7 @@
       const rate = Number(document.getElementById('formDailyRate').value || 150000);
       document.getElementById('formBaseAmount').value = nights * rate;
       updateSummaryPreview();
+      recalcCommissionFromRate();
     }
 
     function recalcFormulaFromInputs() {
@@ -2738,6 +3090,7 @@
       const rate = Number(document.getElementById('formDailyRate').value || 0);
       document.getElementById('formBaseAmount').value = nights * rate;
       updateSummaryPreview();
+      recalcCommissionFromRate();
     }
 
     function updateSummaryPreview() {
@@ -2797,7 +3150,12 @@
         if (document.getElementById('formOrderNote')) document.getElementById('formOrderNote').value = '';
         if (document.getElementById('formSourceNote')) document.getElementById('formSourceNote').value = '';
         document.getElementById('formHotelPartner').value = '';
+        document.getElementById('formCommissionRate').value = 10;
         document.getElementById('formHotelCommission').value = 0;
+        document.getElementById('formDepositMethod').value = 'company';
+        document.getElementById('formDepositReceiver').value = 'TK Công ty (MB 0905888999)';
+        document.getElementById('formPaymentMethod').value = 'staff';
+        document.getElementById('formPaymentReceiver').value = `Thắng (${currentUser.email})`;
         toggleHotelPartnerField();
 
         document.getElementById('formPickupLocation').value = 'Trụ sở & Bãi xe DBP (38 Nguyễn Thái Học)';
@@ -2818,6 +3176,7 @@
         submitBtn.textContent = 'Tạo Đơn Đặt Xe Mới';
 
         handleBikeChange();
+        recalcCommissionFromRate();
       } else {
         // Chỉnh sửa đơn đã có
         const b = bookings.find(x => x.id === bookingId);
@@ -2830,9 +3189,19 @@
         document.getElementById('formBookingSource').value = b.bookingSource || 'direct';
         if (document.getElementById('formOrderNote')) document.getElementById('formOrderNote').value = b.orderNote || b.sourceNote || '';
         if (document.getElementById('formSourceNote')) document.getElementById('formSourceNote').value = b.sourceNote || b.orderNote || '';
-        document.getElementById('formHotelPartner').value = b.hotelPartner || '';
-        document.getElementById('formHotelCommission').value = b.hotelCommission || 0;
+        
+        const partner = b.partnerName || b.hotelPartner || '';
+        document.getElementById('formHotelPartner').value = partner;
+        const commRate = (b.commissionRate !== undefined) ? b.commissionRate : ((b.baseAmount > 0 && (b.commissionAmount || b.hotelCommission)) ? Math.round(((b.commissionAmount || b.hotelCommission) / b.baseAmount) * 100) : 10);
+        document.getElementById('formCommissionRate').value = commRate;
+        document.getElementById('formHotelCommission').value = (b.commissionAmount !== undefined) ? b.commissionAmount : (b.hotelCommission || 0);
+        document.getElementById('formDepositMethod').value = b.depositMethod || 'company';
+        document.getElementById('formDepositReceiver').value = b.depositReceiver || (b.depositMethod === 'company' ? 'TK Công ty (MB 0905888999)' : (b.deliveryStaff || 'Thắng (NV)'));
+        document.getElementById('formPaymentMethod').value = b.paymentMethod || 'staff';
+        document.getElementById('formPaymentReceiver').value = b.paymentReceiver || (b.paymentMethod === 'company' ? 'TK Công ty (MB 0905888999)' : (b.deliveryStaff || 'Thắng (NV)'));
         toggleHotelPartnerField();
+        const hint = document.getElementById('commissionCalcHint');
+        if (hint) hint.textContent = `= ${commRate}% × Tiền thuê (${formatVND(b.baseAmount || 0)})`;
 
         document.getElementById('formMotorcycleId').value = b.motorcycleId;
         document.getElementById('formPickupLocation').value = b.pickupLocation;
@@ -2899,6 +3268,15 @@
         }
       }
 
+      const isPartnerSource = (document.getElementById('formBookingSource').value === 'hotel' || document.getElementById('formBookingSource').value === 'tour');
+      const partnerName = isPartnerSource ? document.getElementById('formHotelPartner').value.trim() : '';
+      const commissionRate = isPartnerSource ? Number(document.getElementById('formCommissionRate').value || 0) : 0;
+      const commissionAmount = isPartnerSource ? Number(document.getElementById('formHotelCommission').value || 0) : 0;
+      const depositMethod = document.getElementById('formDepositMethod') ? document.getElementById('formDepositMethod').value : 'company';
+      const depositReceiver = document.getElementById('formDepositReceiver') ? document.getElementById('formDepositReceiver').value.trim() : 'TK Công ty (MB 0905888999)';
+      const paymentMethod = document.getElementById('formPaymentMethod') ? document.getElementById('formPaymentMethod').value : 'staff';
+      const paymentReceiver = document.getElementById('formPaymentReceiver') ? document.getElementById('formPaymentReceiver').value.trim() : (document.getElementById('formDeliveryStaff').value.trim() || 'Thắng (NV)');
+
       const prepChecklist = (existing && existing.prepChecklist) ? existing.prepChecklist : {
         wash: false,
         brakeTire: false,
@@ -2914,8 +3292,15 @@
         bookingSource: document.getElementById('formBookingSource').value,
         orderNote: document.getElementById('formOrderNote') ? document.getElementById('formOrderNote').value.trim() : '',
         sourceNote: document.getElementById('formOrderNote') ? document.getElementById('formOrderNote').value.trim() : (document.getElementById('formSourceNote') ? document.getElementById('formSourceNote').value.trim() : ''),
-        hotelPartner: document.getElementById('formBookingSource').value === 'hotel' ? document.getElementById('formHotelPartner').value.trim() : '',
-        hotelCommission: document.getElementById('formBookingSource').value === 'hotel' ? Number(document.getElementById('formHotelCommission').value || 0) : 0,
+        partnerName: partnerName,
+        commissionRate: commissionRate,
+        commissionAmount: commissionAmount,
+        hotelPartner: partnerName,
+        hotelCommission: commissionAmount,
+        depositMethod: depositMethod,
+        depositReceiver: depositReceiver,
+        paymentMethod: paymentMethod,
+        paymentReceiver: paymentReceiver,
         motorcycleId: document.getElementById('formMotorcycleId').value,
         pickupLocation: document.getElementById('formPickupLocation').value.trim(),
         startDate: document.getElementById('formStartDate').value,
